@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, Plus, Clock, Flame, ChevronRight } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { categories, courses, type Category } from "@/lib/content";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -10,14 +11,6 @@ export const Route = createFileRoute("/catalog")({
   component: Catalog,
 });
 
-const accentMap = {
-  sage: "bg-accent text-accent-foreground",
-  gold: "bg-gold/40 text-gold-foreground",
-  clay: "bg-clay/15 text-clay",
-} as const;
-
-const emojiFor = (cat: string) =>
-  cat === "guasha" ? "🪷" : cat === "tuina" ? "💆" : cat === "yijinjing" ? "🌾" : "🧘";
 
 function Catalog() {
   const [active, setActive] = useState<Category>("all");
