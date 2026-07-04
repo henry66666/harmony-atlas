@@ -1,19 +1,31 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, Gem, Flame, ArrowRight, Sparkles, Clock, ChevronRight } from "lucide-react";
+import {
+  Bell,
+  Gem,
+  Flame,
+  ArrowRight,
+  Sparkles,
+  Clock,
+  ChevronRight,
+  Leaf,
+  Wind,
+  Award,
+} from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { useAuth } from "@/lib/auth";
 import { courses, images, tips } from "@/lib/content";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const accentMap = {
-  sage: "bg-accent text-accent-foreground",
-  gold: "bg-gold/40 text-gold-foreground",
-  clay: "bg-clay/15 text-clay",
-} as const;
+const quickLinks = [
+  { to: "/tips" as const, label: "Health tips", icon: Leaf, dot: true },
+  { to: "/catalog" as const, label: "Join practice", icon: Wind },
+  { to: "/achievements" as const, label: "My badges", icon: Award },
+];
+
 
 function Home() {
   const { user, streak, openLogin, isPro } = useAuth();
