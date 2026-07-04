@@ -11,6 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AuthProvider } from "@/lib/auth";
+import { LoginModal } from "@/components/LoginModal";
+
 
 function NotFoundComponent() {
   return (
@@ -76,24 +79,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "QiWell — Chinese Wellness, Guided Daily" },
+      {
+        name: "description",
+        content:
+          "QiWell brings Chinese wellness to the world: guided Tui Na, Gua Sha, Baduanjin and Yijinjing practice with daily check-ins, achievements, and a curated care shop.",
+      },
+      { name: "author", content: "QiWell" },
+      { name: "theme-color", content: "#fcfbf8" },
+      { property: "og:title", content: "QiWell — Chinese Wellness, Guided Daily" },
+      {
+        property: "og:description",
+        content:
+          "Guided Tui Na, Gua Sha, Baduanjin & Yijinjing practice with daily check-ins and a curated wellness shop.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@QiWell" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..700&family=Sora:wght@400..800&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -119,8 +135,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AuthProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <LoginModal />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
+
