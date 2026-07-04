@@ -1,24 +1,212 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Bell, Gem, Flame, ArrowRight, Sparkles, Clock, ChevronRight } from "lucide-react";
+import { MobileShell } from "@/components/MobileShell";
+import { useAuth } from "@/lib/auth";
+import { courses, images, tips } from "@/lib/content";
+import { cn } from "@/lib/utils";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const accentMap = {
+  sage: "bg-accent text-accent-foreground",
+  gold: "bg-gold/40 text-gold-foreground",
+  clay: "bg-clay/15 text-clay",
+} as const;
+
+function Home() {
+  const { user, streak, openLogin, isPro } = useAuth();
+  const navigate = useNavigate();
+  const todays = courses[0];
+  const recommended = courses.slice(1, 4);
+
+  const startToday = () => {
+    if (!user) return openLogin();
+    navigate({ to: "/session/$id", params: { id: todays.id } });
+  };
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <MobileShell>
+      {/* Top bar */}
+      <header className="flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div>
+          <p className="font-display text-2xl font-bold italic tracking-tight">QiWell</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">Move your Qi, nourish your calm</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/pro"
+            aria-label="QiWell Pro"
+            className="flex size-9 items-center justify-center rounded-full border border-border bg-card text-clay transition-colors hover:bg-accent"
+          >
+            <Gem className="size-[18px]" />
+          </Link>
+          <button
+            aria-label="Notifications"
+            className="flex size-9 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-accent"
+          >
+            <Bell className="size-[18px]" />
+          </button>
+        </div>
+      </header>
+
+      <div className="flex-1 px-5 pb-8 pt-4">
+        {/* Streak / assessment strip */}
+        {user ? (
+          <div className="flex items-center justify-between rounded-3xl bg-gradient-to-br from-accent to-accent/50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-card/70 text-clay">
+                <Flame className="size-6" />
+              </span>
+              <div>
+                <p className="text-2xl font-bold leading-none text-accent-foreground">{streak}</p>
+                <p className="mt-1 text-xs text-accent-foreground/80">day streak · keep it soft</p>
+              </div>
+            </div>
+            <Link to="/achievements" className="text-sm font-semibold text-accent-foreground/90">
+              Badges →
+            </Link>
+          </div>
+        ) : (
+          <Link
+            to="/assessment"
+            className="flex items-center gap-2 rounded-full bg-gold/60 px-5 py-3 text-sm font-semibold text-gold-foreground transition-transform active:scale-[0.99]"
+          >
+            <Sparkles className="size-4" />
+            Take the 1-minute wellness check
+            <ChevronRight className="ml-auto size-4" />
+          </Link>
+        )}
+
+        {/* Hero illustration */}
+        <div className="relative mt-5 overflow-hidden rounded-4xl bg-secondary/50">
+          <img
+            src={images.heroQigong}
+            alt="A person gently practicing Baduanjin qigong"
+            width={1024}
+            height={1024}
+            className="aspect-square w-full object-cover"
+          />
+        </div>
+
+        {/* Today's practice card */}
+        <div className="mt-5 rounded-4xl border border-border/70 bg-card p-5 shadow-card">
+          <div className="flex items-center justify-between">
+            <span className="rounded-full bg-gold/50 px-3 py-1 text-xs font-semibold text-gold-foreground">
+              Today for you
+            </span>
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="size-3.5" /> {todays.minutes} min
+            </span>
+          </div>
+          <h2 className="mt-3 text-xl font-semibold">{todays.title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {todays.subtitle} · {todays.goal}
+          </p>
+          <button
+            onClick={startToday}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-ink py-3.5 text-sm font-semibold text-ink-foreground transition-transform active:scale-[0.99]"
+          >
+            {user ? "Start today's practice" : "Sign in to begin"}
+            <ArrowRight className="size-4" />
+          </button>
+          {!user && (
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Sign in to save your streak & progress
+            </p>
+          )}
+        </div>
+
+        {/* Quick links */}
+        <div className="mt-6 grid grid-cols-3 gap-3">
+          {[
+            { to: "/tips", label: "Health tips", emoji: "🌿", dot: true },
+            { to: "/catalog", label: "Join practice", emoji: "🧘" },
+            { to: "/achievements", label: "My badges", emoji: "🏵️" },
+          ].map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="relative flex flex-col items-center gap-2 rounded-3xl border border-border/60 bg-card px-2 py-4 text-center transition-colors hover:bg-secondary/60"
+            >
+              {item.dot && <span className="absolute right-4 top-3 size-2 rounded-full bg-clay" />}
+              <span className="text-2xl">{item.emoji}</span>
+              <span className="text-xs font-medium">{item.label}</span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Recommended */}
+        <div className="mt-8 flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Recommended for you</h3>
+          <Link to="/catalog" className="text-sm font-medium text-primary">
+            See all
+          </Link>
+        </div>
+        <div className="mt-3 space-y-3">
+          {recommended.map((c) => (
+            <Link
+              key={c.id}
+              to="/session/$id"
+              params={{ id: c.id }}
+              onClick={(e) => {
+                if (!user) {
+                  e.preventDefault();
+                  openLogin();
+                }
+              }}
+              className="flex items-center gap-4 rounded-3xl border border-border/60 bg-card p-3 transition-colors hover:bg-secondary/50"
+            >
+              <span
+                className={cn(
+                  "flex size-14 shrink-0 items-center justify-center rounded-2xl text-2xl",
+                  accentMap[c.accent],
+                )}
+              >
+                {c.category === "guasha" ? "🪷" : c.category === "tuina" ? "💆" : "🧘"}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">{c.title}</p>
+                <p className="truncate text-sm text-muted-foreground">{c.subtitle}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {c.level} · {c.minutes} min
+                </p>
+              </div>
+              <ChevronRight className="size-5 text-muted-foreground" />
+            </Link>
+          ))}
+        </div>
+
+        {/* Tip teaser */}
+        <div className="mt-8 rounded-4xl bg-accent/50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground/70">
+            Neck care guide
+          </p>
+          <h3 className="mt-2 text-lg font-semibold text-accent-foreground">{tips[0].title}</h3>
+          <p className="mt-1 text-sm text-accent-foreground/80">{tips[0].excerpt}</p>
+          <Link
+            to="/tips"
+            className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent-foreground"
+          >
+            Read more <ArrowRight className="size-4" />
+          </Link>
+        </div>
+
+        {!isPro && (
+          <Link
+            to="/pro"
+            className="mt-4 flex items-center gap-3 rounded-4xl bg-ink p-5 text-ink-foreground"
+          >
+            <Gem className="size-6 shrink-0 text-gold" />
+            <div className="flex-1">
+              <p className="font-semibold">Go QiWell Pro</p>
+              <p className="text-sm text-ink-foreground/70">Unlimited sessions & member scenes</p>
+            </div>
+            <ArrowRight className="size-5" />
+          </Link>
+        )}
+      </div>
+    </MobileShell>
   );
 }

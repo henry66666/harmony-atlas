@@ -9,38 +9,259 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TipsRouteImport } from './routes/tips'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ShopRouteImport } from './routes/shop'
+import { Route as ProRouteImport } from './routes/pro'
+import { Route as MeRouteImport } from './routes/me'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as CatalogRouteImport } from './routes/catalog'
+import { Route as AssessmentRouteImport } from './routes/assessment'
+import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TipsIdRouteImport } from './routes/tips.$id'
+import { Route as ShopIdRouteImport } from './routes/shop.$id'
+import { Route as SessionIdRouteImport } from './routes/session.$id'
 
+const TipsRoute = TipsRouteImport.update({
+  id: '/tips',
+  path: '/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProRoute = ProRouteImport.update({
+  id: '/pro',
+  path: '/pro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeRoute = MeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogRoute = CatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssessmentRoute = AssessmentRouteImport.update({
+  id: '/assessment',
+  path: '/assessment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AchievementsRoute = AchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TipsIdRoute = TipsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => TipsRoute,
+} as any)
+const ShopIdRoute = ShopIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ShopRoute,
+} as any)
+const SessionIdRoute = SessionIdRouteImport.update({
+  id: '/session/$id',
+  path: '/session/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/assessment': typeof AssessmentRoute
+  '/catalog': typeof CatalogRoute
+  '/create': typeof CreateRoute
+  '/me': typeof MeRoute
+  '/pro': typeof ProRoute
+  '/shop': typeof ShopRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/session/$id': typeof SessionIdRoute
+  '/shop/$id': typeof ShopIdRoute
+  '/tips/$id': typeof TipsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/assessment': typeof AssessmentRoute
+  '/catalog': typeof CatalogRoute
+  '/create': typeof CreateRoute
+  '/me': typeof MeRoute
+  '/pro': typeof ProRoute
+  '/shop': typeof ShopRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/session/$id': typeof SessionIdRoute
+  '/shop/$id': typeof ShopIdRoute
+  '/tips/$id': typeof TipsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/assessment': typeof AssessmentRoute
+  '/catalog': typeof CatalogRoute
+  '/create': typeof CreateRoute
+  '/me': typeof MeRoute
+  '/pro': typeof ProRoute
+  '/shop': typeof ShopRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tips': typeof TipsRouteWithChildren
+  '/session/$id': typeof SessionIdRoute
+  '/shop/$id': typeof ShopIdRoute
+  '/tips/$id': typeof TipsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/achievements'
+    | '/assessment'
+    | '/catalog'
+    | '/create'
+    | '/me'
+    | '/pro'
+    | '/shop'
+    | '/sitemap.xml'
+    | '/tips'
+    | '/session/$id'
+    | '/shop/$id'
+    | '/tips/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/achievements'
+    | '/assessment'
+    | '/catalog'
+    | '/create'
+    | '/me'
+    | '/pro'
+    | '/shop'
+    | '/sitemap.xml'
+    | '/tips'
+    | '/session/$id'
+    | '/shop/$id'
+    | '/tips/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/achievements'
+    | '/assessment'
+    | '/catalog'
+    | '/create'
+    | '/me'
+    | '/pro'
+    | '/shop'
+    | '/sitemap.xml'
+    | '/tips'
+    | '/session/$id'
+    | '/shop/$id'
+    | '/tips/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AchievementsRoute: typeof AchievementsRoute
+  AssessmentRoute: typeof AssessmentRoute
+  CatalogRoute: typeof CatalogRoute
+  CreateRoute: typeof CreateRoute
+  MeRoute: typeof MeRoute
+  ProRoute: typeof ProRoute
+  ShopRoute: typeof ShopRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TipsRoute: typeof TipsRouteWithChildren
+  SessionIdRoute: typeof SessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tips': {
+      id: '/tips'
+      path: '/tips'
+      fullPath: '/tips'
+      preLoaderRoute: typeof TipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pro': {
+      id: '/pro'
+      path: '/pro'
+      fullPath: '/pro'
+      preLoaderRoute: typeof ProRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/me': {
+      id: '/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalog': {
+      id: '/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof CatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assessment': {
+      id: '/assessment'
+      path: '/assessment'
+      fullPath: '/assessment'
+      preLoaderRoute: typeof AssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/achievements': {
+      id: '/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +269,63 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tips/$id': {
+      id: '/tips/$id'
+      path: '/$id'
+      fullPath: '/tips/$id'
+      preLoaderRoute: typeof TipsIdRouteImport
+      parentRoute: typeof TipsRoute
+    }
+    '/shop/$id': {
+      id: '/shop/$id'
+      path: '/$id'
+      fullPath: '/shop/$id'
+      preLoaderRoute: typeof ShopIdRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/session/$id': {
+      id: '/session/$id'
+      path: '/session/$id'
+      fullPath: '/session/$id'
+      preLoaderRoute: typeof SessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface ShopRouteChildren {
+  ShopIdRoute: typeof ShopIdRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopIdRoute: ShopIdRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
+interface TipsRouteChildren {
+  TipsIdRoute: typeof TipsIdRoute
+}
+
+const TipsRouteChildren: TipsRouteChildren = {
+  TipsIdRoute: TipsIdRoute,
+}
+
+const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AchievementsRoute: AchievementsRoute,
+  AssessmentRoute: AssessmentRoute,
+  CatalogRoute: CatalogRoute,
+  CreateRoute: CreateRoute,
+  MeRoute: MeRoute,
+  ProRoute: ProRoute,
+  ShopRoute: ShopRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TipsRoute: TipsRouteWithChildren,
+  SessionIdRoute: SessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
