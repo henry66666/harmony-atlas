@@ -97,14 +97,13 @@ function Catalog() {
                 className="block rounded-4xl border border-border/60 bg-card p-4 shadow-card transition-colors hover:bg-secondary/40"
               >
                 <div className="flex items-start gap-4">
-                  <span
-                    className={cn(
-                      "flex size-16 shrink-0 items-center justify-center rounded-3xl text-3xl",
-                      accentMap[c.accent],
-                    )}
-                  >
-                    {emojiFor(c.category)}
-                  </span>
+                  <CategoryIcon
+                    category={c.category}
+                    accent={c.accent}
+                    className="size-16 shrink-0 rounded-3xl"
+                    iconClassName="size-8"
+                  />
+
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate font-semibold">{c.title}</p>
