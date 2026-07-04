@@ -169,14 +169,13 @@ function Home() {
               }}
               className="flex items-center gap-4 rounded-3xl border border-border/60 bg-card p-3 transition-colors hover:bg-secondary/50"
             >
-              <span
-                className={cn(
-                  "flex size-14 shrink-0 items-center justify-center rounded-2xl text-2xl",
-                  accentMap[c.accent],
-                )}
-              >
-                {c.category === "guasha" ? "🪷" : c.category === "tuina" ? "💆" : "🧘"}
-              </span>
+              <CategoryIcon
+                category={c.category}
+                accent={c.accent}
+                className="size-14 shrink-0"
+                iconClassName="size-7"
+              />
+
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{c.title}</p>
                 <p className="truncate text-sm text-muted-foreground">{c.subtitle}</p>
