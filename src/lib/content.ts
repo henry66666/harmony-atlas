@@ -3,6 +3,7 @@ import emptyMeditate from "@/assets/empty-meditate.jpg";
 import shopOil from "@/assets/shop-oil.jpg";
 import shopGuasha from "@/assets/shop-guasha.jpg";
 import shopBianstone from "@/assets/shop-bianstone.jpg";
+import yintangPress from "@/assets/yintang-press.gif.asset.json";
 
 export const images = {
   heroQigong,
@@ -43,6 +44,7 @@ export type Course = {
   accent: "sage" | "gold" | "clay";
   steps: Step[];
   relatedProductId?: string;
+  sessionImage?: string;
 };
 
 export const courses: Course[] = [
@@ -58,8 +60,9 @@ export const courses: Course[] = [
     hot: true,
     accent: "sage",
     relatedProductId: "sleep-oil",
+    sessionImage: yintangPress.url,
     steps: [
-      { name: "Press Shenmen point", detail: "Wrist crease, inner side", seconds: 60, cue: "Breathe slow, sink the shoulders." },
+      { name: "Press Yintang point", detail: "Between the eyebrows", seconds: 60, cue: "Breathe slow, sink the shoulders." },
       { name: "Rub the Yongquan", detail: "Center of the sole", seconds: 90, cue: "Warm the feet, calm the mind." },
       { name: "Raise hands to sky", detail: "Regulate the triple burner", seconds: 80, cue: "Inhale up, exhale release." },
       { name: "Draw the bow left & right", detail: "Open the chest", seconds: 90, cue: "Keep the gaze soft and level." },
