@@ -60,6 +60,7 @@ export const courses: Course[] = [
     hot: true,
     accent: "sage",
     relatedProductId: "sleep-oil",
+    sessionImage: yintangPress.url,
     steps: [
       { name: "Press Yintang point", detail: "Between the eyebrows", seconds: 60, cue: "Breathe slow, sink the shoulders." },
       { name: "Rub the Yongquan", detail: "Center of the sole", seconds: 90, cue: "Warm the feet, calm the mind." },
@@ -78,7 +79,6 @@ export const courses: Course[] = [
     bestFor: "Desk-bound stiffness",
     accent: "gold",
     relatedProductId: "meridian-oil",
-    sessionImage: yintangPress.url,
     steps: [
       { name: "Root the stance", detail: "Feet shoulder-width", seconds: 40, cue: "Weight even through both feet." },
       { name: "Interlace & lift", detail: "Palms turn to the sky", seconds: 90, cue: "Lengthen the spine gently." },
