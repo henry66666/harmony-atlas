@@ -67,10 +67,11 @@ export const courses: Course[] = [
     accent: "sage",
     relatedProductId: "sleep-oil",
     steps: [
-      { name: "Apply cassia seed oil", detail: "Forehead and around the eyes", seconds: 30, cue: "Breathe slow, sink the shoulders.", image: oilApplyGif.url },
+      { name: "Apply cassia seed oil", detail: "Forehead and around the eyes", seconds: 5, cue: "Breathe slow, sink the shoulders.", image: oilApplyGif.url },
       { name: "Press Yintang point", detail: "Between the eyebrows", seconds: 30, cue: "Breathe slow, sink the shoulders.", image: yintangGif.url },
       { name: "Frontal Scrubbing", detail: "forehead", seconds: 30, cue: "Inhale up, exhale release.", image: kaitianmenGif.url },
       { name: "Press Yangbai point", detail: "1 cun above the eyebrows, with the pupils straight up", seconds: 30, cue: "Keep the gaze soft and level.", image: yangbaiGif.url },
+
     ],
   },
   {

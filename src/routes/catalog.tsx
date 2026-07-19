@@ -4,8 +4,10 @@ import { Search, Plus, Clock, Flame, ChevronRight } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { categories, courses, type Category } from "@/lib/content";
+import { useCustomRoutines } from "@/lib/routines";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/catalog")({
   component: Catalog,
@@ -18,13 +20,17 @@ function Catalog() {
   const { user, openLogin } = useAuth();
   const navigate = useNavigate();
 
-  const filtered = courses.filter((c) => {
+  const custom = useCustomRoutines();
+
+  const all = [...custom, ...courses];
+  const filtered = all.filter((c) => {
     const matchesCat = active === "all" || c.category === active;
     const matchesQuery = `${c.title} ${c.subtitle} ${c.goal}`
       .toLowerCase()
       .includes(query.toLowerCase());
     return matchesCat && matchesQuery;
   });
+
 
   const goCreate = () => {
     if (!user) return openLogin();

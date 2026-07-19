@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Plus, Trash2, Check, GripVertical, Camera, Upload, X } from "lucide-react";
+import { Plus, Trash2, Check, GripVertical, Upload, X } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { AppBar } from "@/components/AppBar";
+import { saveCustomRoutine } from "@/lib/routines";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/create")({
   component: CreateRoutine,
 });
 
-const goals = ["Relax", "Sleep", "Focus", "Energy", "Neck ease", "Posture"];
+const defaultGoals = ["Relax", "Sleep", "Focus", "Energy", "Neck ease", "Posture", "Beauty"];
+
 
 type MediaKind = "video" | "image";
 type DurationMode = "seconds" | "reps";
@@ -37,12 +39,16 @@ function detectKind(file: File): MediaKind | null {
 function CreateRoutine() {
   const [name, setName] = useState("");
   const [goal, setGoal] = useState<string | null>(null);
+  const [customGoals, setCustomGoals] = useState<string[]>([]);
+  const [addingGoal, setAddingGoal] = useState(false);
+  const [newGoal, setNewGoal] = useState("");
   const [moves, setMoves] = useState<Move[]>([
     { id: 1, name: "", seconds: 60, reps: 10, mode: "seconds" },
     { id: 2, name: "", seconds: 60, reps: 10, mode: "seconds" },
   ]);
   const [saved, setSaved] = useState(false);
   const fileInputs = useRef<Record<number, HTMLInputElement | null>>({});
+
 
   const addMove = () =>
     setMoves((m) => [...m, { id: Date.now(), name: "", seconds: 60, reps: 10, mode: "seconds" }]);
@@ -73,7 +79,26 @@ function CreateRoutine() {
 
   const canSave = name.trim() && moves.some((m) => m.name.trim() || m.mediaUrl);
 
+  const handleSave = () => {
+    if (!canSave) return;
+    saveCustomRoutine({
+      name: name.trim(),
+      goal,
+      steps: moves
+        .filter((m) => m.name.trim() || m.mediaUrl)
+        .map((m) => ({
+          name: m.name.trim() || "Movement",
+          detail: m.mode === "reps" ? `${m.reps} reps` : "",
+          seconds: m.mode === "seconds" ? m.seconds : Math.max(10, m.reps * 3),
+          cue: "Move gently and stay with the breath.",
+          image: m.mediaKind === "image" ? m.mediaUrl : undefined,
+        })),
+    });
+    setSaved(true);
+  };
+
   if (saved) {
+
     return (
       <MobileShell showNav={false}>
         <AppBar title="Routine saved" />
@@ -102,7 +127,7 @@ function CreateRoutine() {
         title="New routine"
         right={
           <button
-            onClick={() => canSave && setSaved(true)}
+            onClick={handleSave}
             disabled={!canSave}
             className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground disabled:opacity-40"
           >
@@ -112,13 +137,6 @@ function CreateRoutine() {
       />
 
       <div className="flex-1 space-y-6 px-5 pb-10 pt-4">
-        <button className="flex w-full items-center gap-3 rounded-3xl border border-dashed border-border bg-secondary/40 p-4 text-left text-muted-foreground">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-card">
-            <Camera className="size-5" />
-          </span>
-          <span className="text-sm">Add a cover image (optional)</span>
-        </button>
-
         <div>
           <label className="text-sm font-semibold">Routine name</label>
           <input
@@ -134,7 +152,7 @@ function CreateRoutine() {
         <div>
           <label className="text-sm font-semibold">Goal</label>
           <div className="mt-2 flex flex-wrap gap-2">
-            {goals.map((g) => (
+            {[...defaultGoals, ...customGoals].map((g) => (
               <button
                 key={g}
                 onClick={() => setGoal(g)}
@@ -148,6 +166,54 @@ function CreateRoutine() {
                 {g}
               </button>
             ))}
+            {addingGoal ? (
+              <div className="flex items-center gap-1 rounded-full border border-primary bg-card px-2 py-1">
+                <input
+                  autoFocus
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const v = newGoal.trim();
+                      if (v) {
+                        setCustomGoals((g) => [...g, v]);
+                        setGoal(v);
+                      }
+                      setNewGoal("");
+                      setAddingGoal(false);
+                    } else if (e.key === "Escape") {
+                      setNewGoal("");
+                      setAddingGoal(false);
+                    }
+                  }}
+                  placeholder="Custom goal"
+                  maxLength={16}
+                  className="w-28 bg-transparent px-2 text-sm outline-none"
+                />
+                <button
+                  onClick={() => {
+                    const v = newGoal.trim();
+                    if (v) {
+                      setCustomGoals((g) => [...g, v]);
+                      setGoal(v);
+                    }
+                    setNewGoal("");
+                    setAddingGoal(false);
+                  }}
+                  className="rounded-full bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground"
+                >
+                  Add
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAddingGoal(true)}
+                className="flex items-center gap-1 rounded-full border border-dashed border-primary/60 bg-accent/30 px-3 py-2 text-sm font-medium text-primary"
+              >
+                <Plus className="size-3.5" /> Custom
+              </button>
+            )}
+
           </div>
         </div>
 
