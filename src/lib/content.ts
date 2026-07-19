@@ -185,14 +185,6 @@ export const products: Product[] = [
     featured: true,
   },
   {
-    id: "meridian-oil",
-    name: "Meridian Soothing Oil",
-    tagline: "Warms shoulders, neck & wrists",
-    price: 19,
-    image: "shopOil",
-    tags: ["Massage", "Warming"],
-  },
-  {
     id: "guasha-jade",
     name: "Jade Gua Sha Board",
     tagline: "Hand-finished, contoured for the face",
@@ -207,6 +199,14 @@ export const products: Product[] = [
     price: 42,
     image: "shopBianstone",
     tags: ["Body", "Classic"],
+  },
+  {
+    id: "meridian-oil",
+    name: "Meridian Soothing Oil",
+    tagline: "Warms shoulders, neck & wrists",
+    price: 19,
+    image: "shopOil",
+    tags: ["Massage", "Warming"],
   },
 ];
 
