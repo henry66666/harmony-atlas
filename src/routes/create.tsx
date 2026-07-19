@@ -362,7 +362,7 @@ function CreateRoutine() {
                     </div>
                   )}
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    Accepted: MP4, MOV, JPG, JPEG, PNG · or tap ✨ to generate with AI
+                    Accepted: MP4, MOV, JPG, JPEG, PNG, GIF · or tap ✨ to generate with AI
                   </p>
                   {genError && generatingId === null && (
                     <p className="mt-1 text-[11px] text-destructive">{genError}</p>
