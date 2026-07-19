@@ -159,9 +159,14 @@ function Session() {
           <p className="text-sm font-semibold">{course.title}</p>
           <p className="text-xs text-muted-foreground">{course.subtitle}</p>
         </div>
-        <span className="text-sm font-medium text-muted-foreground">
-          {stepIndex + 1}/{total}
-        </span>
+        <div className="flex flex-col items-end">
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-primary">
+            {String(Math.max(0, remaining)).padStart(2, "0")}s
+          </span>
+          <span className="mt-0.5 text-xs font-medium text-muted-foreground">
+            {stepIndex + 1}/{total}
+          </span>
+        </div>
       </header>
 
       {/* Progress */}
