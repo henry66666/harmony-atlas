@@ -48,6 +48,8 @@ function CreateRoutine() {
     { id: 2, name: "", seconds: 60, reps: 10, mode: "seconds" },
   ]);
   const [saved, setSaved] = useState(false);
+  const [generatingId, setGeneratingId] = useState<number | null>(null);
+  const [genError, setGenError] = useState<string | null>(null);
   const fileInputs = useRef<Record<number, HTMLInputElement | null>>({});
 
 
