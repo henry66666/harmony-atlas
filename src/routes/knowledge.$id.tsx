@@ -256,20 +256,25 @@ function ToolbarButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-1 flex-col items-start gap-0.5 rounded-2xl border px-3 py-2 text-left transition-colors",
+        "flex min-w-0 flex-1 items-center gap-2 rounded-2xl border px-2.5 py-2 text-left transition-colors",
         active
           ? "border-primary bg-accent text-accent-foreground"
           : "border-border bg-secondary/40",
       )}
     >
-      <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-card/70 text-foreground">
         {icon}
-        {label}
       </span>
-      <span className="w-full truncate text-xs font-semibold">{value}</span>
+      <span className="flex min-w-0 flex-1 flex-col leading-tight">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
+        <span className="truncate text-[11px] font-semibold">{value}</span>
+      </span>
     </button>
   );
 }
+
 
 function OptionList({
   title,
