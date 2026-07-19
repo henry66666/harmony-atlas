@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, Plus, Clock, Flame, ChevronRight } from "lucide-react";
+import { Search, Plus, Clock, Flame, ChevronRight, Trash2, X } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { categories, courses, type Category } from "@/lib/content";
-import { useCustomRoutines } from "@/lib/routines";
+import { useCustomRoutines, deleteCustomRoutine, type CustomRoutine } from "@/lib/routines";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -17,10 +17,12 @@ export const Route = createFileRoute("/catalog")({
 function Catalog() {
   const [active, setActive] = useState<Category>("all");
   const [query, setQuery] = useState("");
+  const [deleting, setDeleting] = useState<CustomRoutine | null>(null);
   const { user, openLogin } = useAuth();
   const navigate = useNavigate();
 
   const custom = useCustomRoutines();
+
 
   const all = [...custom, ...courses];
   const filtered = all.filter((c) => {
