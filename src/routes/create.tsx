@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Plus, Trash2, Check, GripVertical, Upload, X } from "lucide-react";
+import { Plus, Trash2, Check, GripVertical, Upload, X, Sparkles, Loader2 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { AppBar } from "@/components/AppBar";
 import { saveCustomRoutine } from "@/lib/routines";
+import { generateMoveMedia } from "@/lib/gemini.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/create")({
@@ -47,6 +48,8 @@ function CreateRoutine() {
     { id: 2, name: "", seconds: 60, reps: 10, mode: "seconds" },
   ]);
   const [saved, setSaved] = useState(false);
+  const [generatingId, setGeneratingId] = useState<number | null>(null);
+  const [genError, setGenError] = useState<string | null>(null);
   const fileInputs = useRef<Record<number, HTMLInputElement | null>>({});
 
 
@@ -77,7 +80,43 @@ function CreateRoutine() {
     update(id, { mediaUrl: undefined, mediaKind: undefined, mediaName: undefined });
   };
 
+  const generateWithGemini = async (id: number) => {
+    const move = moves.find((x) => x.id === id);
+    if (!move) return;
+    setGenError(null);
+    setGeneratingId(id);
+    try {
+      const idx = moves.findIndex((x) => x.id === id);
+      const result = await generateMoveMedia({
+        data: {
+          routineName: name.trim() || "Untitled routine",
+          goal,
+          moveName: move.name.trim() || `Movement ${idx + 1}`,
+          moveDetail: "",
+          durationLabel: move.mode === "seconds" ? `${move.seconds}s` : `${move.reps} reps`,
+          index: idx,
+          total: moves.length,
+          siblings: moves.map((s, i) => ({
+            name: s.name.trim() || `Movement ${i + 1}`,
+            detail: s.mode === "seconds" ? `${s.seconds}s` : `${s.reps} reps`,
+          })),
+        },
+      });
+      if (move.mediaUrl?.startsWith("blob:")) URL.revokeObjectURL(move.mediaUrl);
+      update(id, {
+        mediaUrl: result.dataUrl,
+        mediaKind: "image",
+        mediaName: `AI illustration${result.mimeType.includes("png") ? ".png" : ".jpg"}`,
+      });
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : "Failed to generate image");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
   const canSave = name.trim() && moves.some((m) => m.name.trim() || m.mediaUrl);
+
 
   const handleSave = () => {
     if (!canSave) return;
@@ -289,19 +328,40 @@ function CreateRoutine() {
                       </div>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputs.current[m.id]?.click()}
-                      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-secondary/40 py-4 text-sm font-medium text-muted-foreground"
-                    >
-                      <Upload className="size-4" />
-                      Upload video or image
-                    </button>
+                    <div className="flex items-stretch gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputs.current[m.id]?.click()}
+                        disabled={generatingId === m.id}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-secondary/40 py-4 text-sm font-medium text-muted-foreground disabled:opacity-50"
+                      >
+                        <Upload className="size-4" />
+                        Upload video or image
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => generateWithGemini(m.id)}
+                        disabled={generatingId !== null}
+                        aria-label="Generate with Gemini"
+                        title="Generate illustration with Gemini"
+                        className="flex w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/40 bg-gradient-to-br from-accent/60 to-primary/20 text-primary disabled:opacity-50"
+                      >
+                        {generatingId === m.id ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="size-4" />
+                        )}
+                      </button>
+                    </div>
                   )}
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    Accepted: MP4, MOV, JPG, JPEG, PNG
+                    Accepted: MP4, MOV, JPG, JPEG, PNG · or tap ✨ to generate with AI
                   </p>
+                  {genError && generatingId === null && (
+                    <p className="mt-1 text-[11px] text-destructive">{genError}</p>
+                  )}
                 </div>
+
 
                 {/* Duration or reps */}
                 <div className="mt-3 flex items-center gap-2">
