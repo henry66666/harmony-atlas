@@ -32,6 +32,7 @@ function Session() {
   const [finished, setFinished] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [recorded, setRecorded] = useState(false);
+  const [remaining, setRemaining] = useState(course?.steps[0]?.seconds ?? 0);
 
   if (!course) return null;
 
