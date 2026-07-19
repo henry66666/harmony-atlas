@@ -183,7 +183,7 @@ function Session() {
         {/* Illustration / timer */}
         <div className="relative flex flex-col items-center justify-center rounded-4xl bg-card py-10 shadow-card">
           <img
-            src={course.sessionImage ?? images.emptyMeditate}
+            src={step.image ?? course.sessionImage ?? images.emptyMeditate}
             alt=""
             width={1024}
             height={1024}
