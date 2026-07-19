@@ -8,6 +8,7 @@ import oilApplyGif from "@/assets/oil-apply.gif.asset.json";
 import yintangGif from "@/assets/yintang.gif.asset.json";
 import kaitianmenGif from "@/assets/kaitianmen.gif.asset.json";
 import yangbaiGif from "@/assets/yangbai.gif.asset.json";
+import sibaiVideo from "@/assets/sibai.mp4.asset.json";
 void yintangPress;
 
 export const images = {
