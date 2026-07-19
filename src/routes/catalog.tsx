@@ -100,52 +100,104 @@ function Catalog() {
         ) : (
           <div className="space-y-3">
             {filtered.map((c) => (
-              <Link
+              <div
                 key={c.id}
-                to="/session/$id"
-                params={{ id: c.id }}
-                onClick={(e) => {
-                  if (!user) {
-                    e.preventDefault();
-                    openLogin();
-                  }
-                }}
-                className="block rounded-4xl border border-border/60 bg-card p-4 shadow-card transition-colors hover:bg-secondary/40"
+                className="relative rounded-4xl border border-border/60 bg-card shadow-card transition-colors hover:bg-secondary/40"
               >
-                <div className="flex items-start gap-4">
-                  <CategoryIcon
-                    category={c.category}
-                    accent={c.accent}
-                    className="size-16 shrink-0 rounded-3xl"
-                    iconClassName="size-8"
-                  />
+                <Link
+                  to="/session/$id"
+                  params={{ id: c.id }}
+                  onClick={(e) => {
+                    if (!user) {
+                      e.preventDefault();
+                      openLogin();
+                    }
+                  }}
+                  className="block p-4 pr-12"
+                >
+                  <div className="flex items-start gap-4">
+                    <CategoryIcon
+                      category={c.category}
+                      accent={c.accent}
+                      className="size-16 shrink-0 rounded-3xl"
+                      iconClassName="size-8"
+                    />
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate font-semibold">{c.title}</p>
-                      {c.hot && (
-                        <span className="flex items-center gap-0.5 rounded-full bg-clay/15 px-2 py-0.5 text-[10px] font-semibold text-clay">
-                          <Flame className="size-3" /> Popular
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate font-semibold">{c.title}</p>
+                        {c.hot && (
+                          <span className="flex items-center gap-0.5 rounded-full bg-clay/15 px-2 py-0.5 text-[10px] font-semibold text-clay">
+                            <Flame className="size-3" /> Popular
+                          </span>
+                        )}
+                      </div>
+                      <p className="truncate text-sm text-muted-foreground">{c.subtitle}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="size-3.5" /> {c.minutes} min
                         </span>
-                      )}
+                        <span>· {c.level}</span>
+                        <span>· {c.bestFor}</span>
+                      </div>
                     </div>
-                    <p className="truncate text-sm text-muted-foreground">{c.subtitle}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="size-3.5" /> {c.minutes} min
-                      </span>
-                      <span>· {c.level}</span>
-                      <span>· {c.bestFor}</span>
-                    </div>
+                    <ChevronRight className="mt-1 size-5 shrink-0 text-muted-foreground" />
                   </div>
-                  <ChevronRight className="mt-1 size-5 shrink-0 text-muted-foreground" />
-                </div>
-              </Link>
+                </Link>
+
+                {c.custom && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleting(c as CustomRoutine);
+                    }}
+                    aria-label="Delete routine"
+                    className="absolute bottom-3 right-3 flex size-8 items-center justify-center rounded-full bg-destructive/10 text-destructive transition-colors active:scale-95 hover:bg-destructive/20"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         )}
 
+        {/* Delete confirmation dialog */}
+        {deleting && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5">
+            <div className="w-full max-w-sm rounded-3xl bg-card p-6 shadow-lg">
+              <div className="flex items-start justify-between">
+                <h3 className="text-lg font-semibold">Delete routine?</h3>
+                <button
+                  onClick={() => setDeleting(null)}
+                  className="rounded-full p-1 text-muted-foreground hover:bg-secondary"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                “{deleting.title}” will be removed from your My Routine list. This cannot be undone.
+              </p>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setDeleting(null)}
+                  className="rounded-2xl border border-border py-3 text-sm font-semibold text-muted-foreground"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="rounded-2xl bg-destructive py-3 text-sm font-semibold text-destructive-foreground"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Create your own callout */}
+
         <button
           onClick={goCreate}
           className="mt-5 flex w-full items-center gap-3 rounded-4xl border border-dashed border-primary/50 bg-accent/30 p-5 text-left transition-colors hover:bg-accent/50"
