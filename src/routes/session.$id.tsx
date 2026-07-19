@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse, getProduct, images } from "@/lib/content";
@@ -32,6 +32,7 @@ function Session() {
   const [finished, setFinished] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [recorded, setRecorded] = useState(false);
+  const [remaining, setRemaining] = useState(course?.steps[0]?.seconds ?? 0);
 
   if (!course) return null;
 
@@ -49,9 +50,22 @@ function Session() {
   };
 
   const next = () => {
-    if (stepIndex < total - 1) setStepIndex((i) => i + 1);
-    else complete();
+    if (stepIndex < total - 1) {
+      setStepIndex((i) => i + 1);
+      setRemaining(course.steps[stepIndex + 1]?.seconds ?? 0);
+    } else complete();
   };
+
+  useEffect(() => {
+    if (finished || paused) return;
+    if (remaining <= 0) {
+      next();
+      return;
+    }
+    const t = setTimeout(() => setRemaining((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remaining, paused, finished, stepIndex]);
 
   /* ---------- Completion screen ---------- */
   if (finished) {
@@ -145,9 +159,14 @@ function Session() {
           <p className="text-sm font-semibold">{course.title}</p>
           <p className="text-xs text-muted-foreground">{course.subtitle}</p>
         </div>
-        <span className="text-sm font-medium text-muted-foreground">
-          {stepIndex + 1}/{total}
-        </span>
+        <div className="flex flex-col items-end">
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-primary">
+            {String(Math.max(0, remaining)).padStart(2, "0")}s
+          </span>
+          <span className="mt-0.5 text-xs font-medium text-muted-foreground">
+            {stepIndex + 1}/{total}
+          </span>
+        </div>
       </header>
 
       {/* Progress */}
@@ -164,7 +183,7 @@ function Session() {
         {/* Illustration / timer */}
         <div className="relative flex flex-col items-center justify-center rounded-4xl bg-card py-10 shadow-card">
           <img
-            src={course.sessionImage ?? images.emptyMeditate}
+            src={step.image ?? course.sessionImage ?? images.emptyMeditate}
             alt=""
             width={1024}
             height={1024}
@@ -188,7 +207,13 @@ function Session() {
         <div className="mt-auto pt-6">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
+              onClick={() => {
+                if (stepIndex > 0) {
+                  const p = stepIndex - 1;
+                  setStepIndex(p);
+                  setRemaining(course.steps[p].seconds);
+                }
+              }}
               disabled={stepIndex === 0}
               className="flex size-14 items-center justify-center rounded-2xl border border-border bg-card text-foreground disabled:opacity-40"
               aria-label="Previous move"

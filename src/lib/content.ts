@@ -4,6 +4,11 @@ import shopOil from "@/assets/shop-oil.jpg";
 import shopGuasha from "@/assets/shop-guasha.jpg";
 import shopBianstone from "@/assets/shop-bianstone.jpg";
 import yintangPress from "@/assets/yintang-press.gif.asset.json";
+import oilApplyGif from "@/assets/oil-apply.gif.asset.json";
+import yintangGif from "@/assets/yintang.gif.asset.json";
+import kaitianmenGif from "@/assets/kaitianmen.gif.asset.json";
+import yangbaiGif from "@/assets/yangbai.gif.asset.json";
+void yintangPress;
 
 export const images = {
   heroQigong,
@@ -29,6 +34,7 @@ export type Step = {
   detail: string;
   seconds: number;
   cue: string;
+  image?: string;
 };
 
 export type Course = {
@@ -50,22 +56,21 @@ export type Course = {
 export const courses: Course[] = [
   {
     id: "evening-calm",
-    title: "Evening Calm",
-    subtitle: "Baduanjin · 8 forms",
+    title: "Eye Protection",
+    subtitle: "Suitable for children",
     category: "baduanjin",
     level: "Gentle",
     minutes: 12,
-    goal: "Wind down & sleep",
-    bestFor: "Restless minds before bed",
+    goal: "Suitable for children",
+    bestFor: "Young eyes tired from screens",
     hot: true,
     accent: "sage",
     relatedProductId: "sleep-oil",
-    sessionImage: yintangPress.url,
     steps: [
-      { name: "Press Yintang point", detail: "Between the eyebrows", seconds: 60, cue: "Breathe slow, sink the shoulders." },
-      { name: "Rub the Yongquan", detail: "Center of the sole", seconds: 90, cue: "Warm the feet, calm the mind." },
-      { name: "Raise hands to sky", detail: "Regulate the triple burner", seconds: 80, cue: "Inhale up, exhale release." },
-      { name: "Draw the bow left & right", detail: "Open the chest", seconds: 90, cue: "Keep the gaze soft and level." },
+      { name: "Apply cassia seed oil", detail: "Forehead and around the eyes", seconds: 30, cue: "Breathe slow, sink the shoulders.", image: oilApplyGif.url },
+      { name: "Press Yintang point", detail: "Between the eyebrows", seconds: 30, cue: "Breathe slow, sink the shoulders.", image: yintangGif.url },
+      { name: "Frontal Scrubbing", detail: "forehead", seconds: 30, cue: "Inhale up, exhale release.", image: kaitianmenGif.url },
+      { name: "Press Yangbai point", detail: "1 cun above the eyebrows, with the pupils straight up", seconds: 30, cue: "Keep the gaze soft and level.", image: yangbaiGif.url },
     ],
   },
   {
@@ -180,14 +185,6 @@ export const products: Product[] = [
     featured: true,
   },
   {
-    id: "meridian-oil",
-    name: "Meridian Soothing Oil",
-    tagline: "Warms shoulders, neck & wrists",
-    price: 19,
-    image: "shopOil",
-    tags: ["Massage", "Warming"],
-  },
-  {
     id: "guasha-jade",
     name: "Jade Gua Sha Board",
     tagline: "Hand-finished, contoured for the face",
@@ -202,6 +199,14 @@ export const products: Product[] = [
     price: 42,
     image: "shopBianstone",
     tags: ["Body", "Classic"],
+  },
+  {
+    id: "meridian-oil",
+    name: "Meridian Soothing Oil",
+    tagline: "Warms shoulders, neck & wrists",
+    price: 19,
+    image: "shopOil",
+    tags: ["Massage", "Warming"],
   },
 ];
 

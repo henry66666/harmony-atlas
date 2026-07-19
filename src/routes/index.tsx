@@ -114,7 +114,7 @@ function Home() {
           </div>
           <h2 className="mt-3 text-xl font-semibold">{todays.title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {todays.subtitle} · {todays.goal}
+            {todays.subtitle}
           </p>
           <button
             onClick={startToday}
