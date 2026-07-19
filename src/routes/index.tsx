@@ -5,7 +5,7 @@ import {
   Gem,
   Flame,
   ArrowRight,
-  Sparkles,
+  
   Clock,
   ChevronRight,
   Leaf,
