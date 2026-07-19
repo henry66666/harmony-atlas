@@ -47,6 +47,7 @@ function Home() {
   const navigate = useNavigate();
   const todays = courses[0];
   const recommended = courses.slice(1, 4);
+  const [heroA, heroB] = useMemo(() => pickTwoRandom(heroImages), []);
 
   const startToday = () => {
     if (!user) return openLogin();
