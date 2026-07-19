@@ -212,7 +212,7 @@ export const generateMoveMedia = createServerFn({ method: "POST" })
           .join("\n")
       : "  (none)";
 
-    const prompt = `Create a single high-quality illustration for a Chinese wellness (TCM) mobile app.
+    const prompt = `Create a single high-quality illustration of a 中式养生动作 (Chinese wellness / TCM movement) for a mobile app.
 
 ROUTINE CONTEXT
 - Routine name: ${data.routineName || "(untitled routine)"}
