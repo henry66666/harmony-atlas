@@ -188,7 +188,15 @@ export const generateMoveMedia = createServerFn({ method: "POST" })
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
-    const model = "gemini-2.5-flash-image";
+    // Try models in order; free-tier quota on the "preview-image" alias is often 0,
+    // so we fall back to alternative image-capable models on 429 / 404.
+    const envModel = process.env.GEMINI_IMAGE_MODEL;
+    const modelCandidates = [
+      envModel,
+      "gemini-2.5-flash-image",
+      "gemini-2.0-flash-preview-image-generation",
+      "gemini-2.0-flash-exp-image-generation",
+    ].filter((m): m is string => typeof m === "string" && m.length > 0);
 
     const siblingLines = data.siblings.length
       ? data.siblings
@@ -220,34 +228,47 @@ VISUAL STYLE (must follow strictly)
 
 Return one image only.`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    let lastError = "";
+    let lastStatus = 0;
+    for (const model of modelCandidates) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ["IMAGE"] },
+        }),
+      });
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { responseModalities: ["IMAGE"] },
-      }),
-    });
+      if (res.ok) {
+        const json = (await res.json()) as {
+          candidates?: {
+            content?: {
+              parts?: { inlineData?: { mimeType?: string; data?: string } }[];
+            };
+          }[];
+        };
+        const part = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
+        const inline = part?.inlineData;
+        if (!inline?.data) {
+          lastError = "Gemini returned no image data";
+          continue;
+        }
+        const mimeType = inline.mimeType || "image/png";
+        return { dataUrl: `data:${mimeType};base64,${inline.data}`, mimeType, model };
+      }
 
-    if (!res.ok) {
-      const errBody = await res.text();
-      throw new Error(`Gemini image request failed [${res.status}]: ${errBody}`);
+      lastStatus = res.status;
+      lastError = await res.text();
+      // Only fall through on quota / not-found; other errors are terminal.
+      if (res.status !== 429 && res.status !== 404) break;
     }
 
-    const json = (await res.json()) as {
-      candidates?: {
-        content?: {
-          parts?: { inlineData?: { mimeType?: string; data?: string } }[];
-        };
-      }[];
-    };
-
-    const part = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
-    const inline = part?.inlineData;
-    if (!inline?.data) throw new Error("Gemini returned no image data");
-
-    const mimeType = inline.mimeType || "image/png";
-    return { dataUrl: `data:${mimeType};base64,${inline.data}`, mimeType };
+    if (lastStatus === 429) {
+      throw new Error(
+        "Image generation quota exhausted on the free tier for all available image models. Enable billing on your Google AI project, or set GEMINI_IMAGE_MODEL to a model your key has quota for.",
+      );
+    }
+    throw new Error(`Gemini image request failed [${lastStatus}]: ${lastError}`);
   });
