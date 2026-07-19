@@ -50,7 +50,8 @@ STYLE
 - Do not invent medical claims. Frame benefits as traditional wellness support, not medical treatment.
 - Output pure Markdown only. No preamble, no closing remarks outside the sections above.`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const model = process.env.GEMINI_MODEL ?? "gemini-flash-latest";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
     const res = await fetch(url, {
       method: "POST",
