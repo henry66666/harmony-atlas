@@ -43,10 +43,11 @@ function Catalog() {
 
   const confirmDelete = () => {
     if (deleting) {
-      deleteCustomRoutine(deleting.id);
+      void deleteCustomRoutine(deleting.id);
       setDeleting(null);
     }
   };
+
 
   return (
 

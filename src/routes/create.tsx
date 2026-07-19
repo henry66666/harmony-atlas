@@ -119,24 +119,30 @@ function CreateRoutine() {
   const canSave = name.trim() && moves.some((m) => m.name.trim() || m.mediaUrl);
 
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!canSave) return;
-    saveCustomRoutine({
-      name: name.trim(),
-      goal,
-      steps: moves
-        .filter((m) => m.name.trim() || m.mediaUrl)
-        .map((m) => ({
-          name: m.name.trim() || "Movement",
-          detail: m.mode === "reps" ? `${m.reps} reps` : "",
-          seconds: m.mode === "seconds" ? m.seconds : Math.max(10, m.reps * 3),
-          cue: "Move gently and stay with the breath.",
-          image: m.mediaKind === "image" ? m.mediaUrl : undefined,
-          video: m.mediaKind === "video" ? m.mediaUrl : undefined,
-        })),
-    });
-    setSaved(true);
+    try {
+      await saveCustomRoutine({
+        name: name.trim(),
+        goal,
+        steps: moves
+          .filter((m) => m.name.trim() || m.mediaUrl)
+          .map((m) => ({
+            name: m.name.trim() || "Movement",
+            detail: m.mode === "reps" ? `${m.reps} reps` : "",
+            seconds: m.mode === "seconds" ? m.seconds : Math.max(10, m.reps * 3),
+            cue: "Move gently and stay with the breath.",
+            image: m.mediaKind === "image" ? m.mediaUrl : undefined,
+            video: m.mediaKind === "video" ? m.mediaUrl : undefined,
+          })),
+      });
+      setSaved(true);
+    } catch (err) {
+      console.error("Failed to save routine", err);
+      alert("Sorry, we couldn't save this routine. Please try again.");
+    }
   };
+
 
   if (saved) {
 

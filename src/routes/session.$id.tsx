@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag, Sparkles, BookOpen } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse, getProduct, images } from "@/lib/content";
-import { getCustomRoutine } from "@/lib/routines";
+import { useCustomRoutine } from "@/lib/routines";
 
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/session/$id")({
 
 function Session() {
   const { id } = useParams({ from: "/session/$id" });
-  const course = getCourse(id) ?? getCustomRoutine(id);
+  const course = getCourse(id) ?? useCustomRoutine(id);
   const navigate = useNavigate();
   const { recordSession } = useAuth();
 
@@ -64,7 +64,7 @@ function Session() {
       next();
       return;
     }
-    const t = setTimeout(() => setRemaining((s) => s - 1), 1000);
+    const t = setTimeout(() => setRemaining((s: number) => s - 1), 1000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining, paused, finished, stepIndex]);

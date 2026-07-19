@@ -6,47 +6,144 @@ export type CustomRoutine = Course & {
   createdAt: number;
 };
 
-const KEY = "qiwell.customRoutines.v1";
+const DB_NAME = "qiwell";
+const DB_VERSION = 1;
+const STORE = "routines";
+const LEGACY_KEY = "qiwell.customRoutines.v1";
 
-function read(): CustomRoutine[] {
+let cache: CustomRoutine[] = [];
+let hydrated = false;
+let hydratePromise: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+function notify() {
+  for (const l of listeners) l();
+}
+
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        db.createObjectStore(STORE, { keyPath: "id" });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbGetAll(): Promise<CustomRoutine[]> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readonly");
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve((req.result as CustomRoutine[]) ?? []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbPut(item: CustomRoutine): Promise<void> {
+  const db = await openDB();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(item);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+async function idbDelete(id: string): Promise<void> {
+  const db = await openDB();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+async function migrateLegacy(): Promise<CustomRoutine[]> {
   if (typeof window === "undefined") return [];
   try {
-    const raw = window.localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as CustomRoutine[]) : [];
+    const raw = window.localStorage.getItem(LEGACY_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw) as CustomRoutine[];
+    for (const item of arr) {
+      try {
+        await idbPut(item);
+      } catch {
+        // ignore individual failures
+      }
+    }
+    window.localStorage.removeItem(LEGACY_KEY);
+    return arr;
   } catch {
+    try {
+      window.localStorage.removeItem(LEGACY_KEY);
+    } catch {}
     return [];
   }
 }
 
-function write(list: CustomRoutine[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(KEY, JSON.stringify(list));
-  window.dispatchEvent(new Event("qiwell:routines"));
+function sortDesc(list: CustomRoutine[]): CustomRoutine[] {
+  return [...list].sort((a, b) => b.createdAt - a.createdAt);
+}
+
+export function hydrateRoutines(): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (hydrated) return Promise.resolve();
+  if (hydratePromise) return hydratePromise;
+  hydratePromise = (async () => {
+    try {
+      await migrateLegacy();
+      const all = await idbGetAll();
+      cache = sortDesc(all);
+    } catch {
+      cache = [];
+    } finally {
+      hydrated = true;
+      notify();
+    }
+  })();
+  return hydratePromise;
+}
+
+if (typeof window !== "undefined") {
+  void hydrateRoutines();
 }
 
 export function getCustomRoutines(): CustomRoutine[] {
-  return read();
+  return cache;
 }
 
 export function getCustomRoutine(id: string): CustomRoutine | undefined {
-  return read().find((r) => r.id === id);
+  return cache.find((r) => r.id === id);
 }
 
-export function deleteCustomRoutine(id: string): boolean {
-  const list = read();
-  const next = list.filter((r) => r.id !== id);
-  if (next.length === list.length) return false;
-  write(next);
+export async function deleteCustomRoutine(id: string): Promise<boolean> {
+  await hydrateRoutines();
+  const exists = cache.some((r) => r.id === id);
+  if (!exists) return false;
+  cache = cache.filter((r) => r.id !== id);
+  notify();
+  try {
+    await idbDelete(id);
+  } catch {
+    // best effort; cache is already updated
+  }
   return true;
 }
 
-
-export function saveCustomRoutine(routine: {
+export async function saveCustomRoutine(routine: {
   name: string;
   goal: string | null;
   steps: Step[];
-}): CustomRoutine {
-  const list = read();
+}): Promise<CustomRoutine> {
+  await hydrateRoutines();
   const totalSeconds = routine.steps.reduce((s, m) => s + (m.seconds || 0), 0);
   const minutes = Math.max(1, Math.round(totalSeconds / 60));
   const id = `custom-${Date.now()}`;
@@ -64,21 +161,30 @@ export function saveCustomRoutine(routine: {
     custom: true,
     createdAt: Date.now(),
   };
-  write([item, ...list]);
+  cache = sortDesc([item, ...cache]);
+  notify();
+  await idbPut(item);
   return item;
 }
 
-export function useCustomRoutines(): CustomRoutine[] {
-  const [list, setList] = useState<CustomRoutine[]>([]);
+function useRoutinesSubscription() {
+  const [, setVersion] = useState(0);
   useEffect(() => {
-    const sync = () => setList(read());
-    sync();
-    window.addEventListener("qiwell:routines", sync);
-    window.addEventListener("storage", sync);
+    const l = () => setVersion((v) => v + 1);
+    listeners.add(l);
+    void hydrateRoutines();
     return () => {
-      window.removeEventListener("qiwell:routines", sync);
-      window.removeEventListener("storage", sync);
+      listeners.delete(l);
     };
   }, []);
-  return list;
+}
+
+export function useCustomRoutines(): CustomRoutine[] {
+  useRoutinesSubscription();
+  return cache;
+}
+
+export function useCustomRoutine(id: string): CustomRoutine | undefined {
+  useRoutinesSubscription();
+  return cache.find((r) => r.id === id);
 }

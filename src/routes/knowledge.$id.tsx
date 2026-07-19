@@ -5,7 +5,7 @@ import { ChevronLeft, Sparkles, Loader2, RefreshCw, Cpu, Brain, Languages, Check
 import ReactMarkdown from "react-markdown";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse } from "@/lib/content";
-import { getCustomRoutine } from "@/lib/routines";
+import { useCustomRoutine } from "@/lib/routines";
 import {
   fetchWellnessKnowledge,
   GEMINI_MODELS,
@@ -48,7 +48,7 @@ type Panel = "model" | "reasoning" | "language" | null;
 function KnowledgePage() {
   const { id } = useParams({ from: "/knowledge/$id" });
   const { step: stepParam } = useSearch({ from: "/knowledge/$id" });
-  const course = getCourse(id) ?? getCustomRoutine(id);
+  const course = getCourse(id) ?? useCustomRoutine(id);
 
   const [modelId, setModelId] = useState<string>(GEMINI_MODELS[0].id);
   const [reasoningId, setReasoningId] = useState<string>(REASONING_LEVELS[0].id);
