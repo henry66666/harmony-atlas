@@ -8,6 +8,7 @@ import oilApplyGif from "@/assets/oil-apply.gif.asset.json";
 import yintangGif from "@/assets/yintang.gif.asset.json";
 import kaitianmenGif from "@/assets/kaitianmen.gif.asset.json";
 import yangbaiGif from "@/assets/yangbai.gif.asset.json";
+import sibaiVideo from "@/assets/sibai.mp4.asset.json";
 void yintangPress;
 
 export const images = {
@@ -113,8 +114,8 @@ export const courses: Course[] = [
   },
   {
     id: "guasha-face",
-    title: "Facial Gua Sha Glow",
-    subtitle: "Gua Sha · lymphatic",
+    title: "Facial massage",
+    subtitle: "Beauty",
     category: "guasha",
     level: "Gentle",
     minutes: 8,
@@ -123,10 +124,10 @@ export const courses: Course[] = [
     accent: "sage",
     relatedProductId: "guasha-jade",
     steps: [
-      { name: "Apply facial oil", detail: "A few drops, warm", seconds: 30, cue: "Enough glide, never dragging." },
-      { name: "Jawline sweep", detail: "Chin to ear", seconds: 70, cue: "Light, upward strokes only." },
-      { name: "Cheek lift", detail: "Nose to temple", seconds: 70, cue: "Follow the cheekbone up." },
-      { name: "Neck drainage", detail: "Down toward collarbone", seconds: 60, cue: "Finish downward to drain." },
+      { name: "Apply facial oil", detail: "A few drops, warm", seconds: 5, cue: "Enough glide, never dragging.", video: sibaiVideo.url },
+      { name: "Press Sibai point", detail: "Keep the gaze soft and level.", seconds: 40, cue: "Light, upward strokes only.", video: sibaiVideo.url },
+      { name: "Cheek lift", detail: "Nose to temple", seconds: 70, cue: "Follow the cheekbone up.", video: sibaiVideo.url },
+      { name: "Neck drainage", detail: "Down toward collarbone", seconds: 60, cue: "Finish downward to drain.", video: sibaiVideo.url },
     ],
   },
   {
