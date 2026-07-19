@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag } from "lucide-react";
+import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag, Sparkles, BookOpen } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse, getProduct, images } from "@/lib/content";
 import { getCustomRoutine } from "@/lib/routines";
@@ -206,6 +206,37 @@ function Session() {
             💡 {step.cue}
           </p>
         </div>
+
+        {/* Gemini knowledge card */}
+        <Link
+          to="/knowledge/$id"
+          params={{ id: course.id }}
+          search={{ step: stepIndex }}
+          className="mt-4 block rounded-4xl border border-gold/50 bg-gradient-to-br from-gold/25 via-card to-sage/20 p-5 shadow-card transition-transform active:scale-[0.99]"
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-card/80 text-gold-foreground">
+              <Sparkles className="size-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gold-foreground/80">
+                  Wellness insight
+                </p>
+                <span className="rounded-full bg-card/70 px-2 py-0.5 text-[10px] font-semibold text-foreground/70">
+                  AI · Gemini
+                </span>
+              </div>
+              <p className="mt-1 text-sm font-semibold text-foreground">
+                Learn the TCM story behind "{step.name}"
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Meridians, benefits & how to practice well.
+              </p>
+            </div>
+            <BookOpen className="mt-1 size-5 shrink-0 text-gold-foreground/70" />
+          </div>
+        </Link>
 
         <div className="mt-auto pt-6">
           <div className="flex items-center gap-3">
