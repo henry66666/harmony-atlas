@@ -39,7 +39,15 @@ function Catalog() {
     navigate({ to: "/create" });
   };
 
+  const confirmDelete = () => {
+    if (deleting) {
+      deleteCustomRoutine(deleting.id);
+      setDeleting(null);
+    }
+  };
+
   return (
+
     <MobileShell>
       <header className="px-5 pb-1 pt-[max(env(safe-area-inset-top),1rem)]">
         <div className="flex items-center justify-between">
