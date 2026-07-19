@@ -96,16 +96,7 @@ function Home() {
               Badges →
             </Link>
           </div>
-        ) : (
-          <Link
-            to="/assessment"
-            className="flex items-center gap-2 rounded-full bg-gold/60 px-5 py-3 text-sm font-semibold text-gold-foreground transition-transform active:scale-[0.99]"
-          >
-            <Sparkles className="size-4" />
-            Take the 1-minute wellness check
-            <ChevronRight className="ml-auto size-4" />
-          </Link>
-        )}
+        ) : null}
 
         {/* Hero illustrations */}
         <div className="mt-5 grid grid-cols-2 gap-3">
