@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ChevronRight,
   ShoppingBag,
@@ -10,23 +11,21 @@ import {
   Flame,
   Clock,
   Award,
+  Check,
+  X,
 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { useAuth } from "@/lib/auth";
+import { LANGUAGES, useLang, type LangCode } from "@/lib/i18n";
 
 export const Route = createFileRoute("/me")({
   component: Me,
 });
 
-const menu = [
-  { to: "/shop", label: "Order center", icon: ShoppingBag },
-  { to: "/", label: "Practice reminders", icon: Bell },
-  { to: "/", label: "Language", icon: Globe, value: "English" },
-  { to: "/", label: "About QiWell", icon: Info },
-] as const;
-
 function Me() {
   const { user, streak, totalMinutes, totalSessions, isPro, openLogin, logout } = useAuth();
+  const { lang, setLang, langDef, translating } = useLang();
+  const [langOpen, setLangOpen] = useState(false);
 
   return (
     <MobileShell>
@@ -81,7 +80,9 @@ function Me() {
                   const done = i < Math.min(streak, 7);
                   return (
                     <div key={i} className="flex flex-col items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{d}</span>
+                      <span className="text-xs text-muted-foreground" data-no-translate>
+                        {d}
+                      </span>
                       <span
                         className={
                           done
@@ -115,20 +116,45 @@ function Me() {
 
         {/* Menu */}
         <div className="mt-6 overflow-hidden rounded-4xl border border-border/60 bg-card">
-          {menu.map((item, i) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className="flex items-center gap-3 border-b border-border/60 px-5 py-4 last:border-0 transition-colors hover:bg-secondary/40"
-            >
-              <item.icon className="size-5 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">{item.label}</span>
-              {"value" in item && item.value && (
-                <span className="text-sm text-muted-foreground">{item.value}</span>
-              )}
-              <ChevronRight className="size-4 text-muted-foreground" />
-            </Link>
-          ))}
+          <Link
+            to="/shop"
+            className="flex items-center gap-3 border-b border-border/60 px-5 py-4 transition-colors hover:bg-secondary/40"
+          >
+            <ShoppingBag className="size-5 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Order center</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Link>
+
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 border-b border-border/60 px-5 py-4 text-left transition-colors hover:bg-secondary/40"
+          >
+            <Bell className="size-5 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Practice reminders</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setLangOpen(true)}
+            className="flex w-full items-center gap-3 border-b border-border/60 px-5 py-4 text-left transition-colors hover:bg-secondary/40"
+          >
+            <Globe className="size-5 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Language</span>
+            <span className="text-sm text-muted-foreground" data-no-translate>
+              {langDef.label}
+            </span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
+
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-secondary/40"
+          >
+            <Info className="size-5 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">About QiWell</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
         </div>
 
         {user && (
@@ -142,7 +168,85 @@ function Me() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">QiWell · v1.0 · Made with care</p>
       </div>
+
+      {langOpen && (
+        <LanguageSheet
+          currentLang={lang}
+          translating={translating}
+          onSelect={(code) => {
+            setLang(code);
+            setLangOpen(false);
+          }}
+          onClose={() => setLangOpen(false)}
+        />
+      )}
     </MobileShell>
+  );
+}
+
+function LanguageSheet({
+  currentLang,
+  translating,
+  onSelect,
+  onClose,
+}: {
+  currentLang: LangCode;
+  translating: boolean;
+  onSelect: (code: LangCode) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40" onClick={onClose}>
+      <div
+        className="w-full max-w-md rounded-t-4xl bg-card p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold">Language</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Applied across the whole app
+              {translating ? " · translating…" : ""}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="flex size-9 items-center justify-center rounded-full border border-border bg-card"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+        <ul className="mt-4 max-h-[60vh] space-y-1 overflow-y-auto">
+          {LANGUAGES.map((l) => {
+            const active = l.code === currentLang;
+            return (
+              <li key={l.code}>
+                <button
+                  type="button"
+                  onClick={() => onSelect(l.code)}
+                  className={
+                    active
+                      ? "flex w-full items-center gap-3 rounded-2xl bg-accent/60 px-4 py-3 text-left"
+                      : "flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-secondary/50"
+                  }
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold" data-no-translate>
+                      {l.label}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground" data-no-translate>
+                      {l.english} · {l.country}
+                    </p>
+                  </div>
+                  {active && <Check className="size-4 text-primary" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
   );
 }
 

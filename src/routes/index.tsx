@@ -5,12 +5,8 @@ import {
   Gem,
   Flame,
   ArrowRight,
-  
   Clock,
   ChevronRight,
-  Leaf,
-  Wind,
-  Award,
 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { CategoryIcon } from "@/components/CategoryIcon";
@@ -38,17 +34,11 @@ function pickTwoRandom<T>(arr: T[]): [T, T] {
   return [arr[i], arr[j]];
 }
 import { useAuth } from "@/lib/auth";
-import { courses, images, tips } from "@/lib/content";
+import { courses } from "@/lib/content";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
-
-const quickLinks = [
-  { to: "/tips" as const, label: "Health tips", icon: Leaf, dot: true },
-  { to: "/catalog" as const, label: "Join practice", icon: Wind },
-  { to: "/achievements" as const, label: "My badges", icon: Award },
-];
 
 
 function Home() {
@@ -148,22 +138,8 @@ function Home() {
           )}
         </div>
 
-        {/* Quick links */}
-        <div className="mt-6 grid grid-cols-3 gap-3">
-          {quickLinks.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="relative flex flex-col items-center gap-2 rounded-3xl border border-border/60 bg-card px-2 py-4 text-center transition-colors hover:bg-secondary/60"
-            >
-              {item.dot && <span className="absolute right-4 top-3 size-2 rounded-full bg-clay" />}
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
-                <item.icon className="size-5" strokeWidth={1.8} />
-              </span>
-              <span className="text-xs font-medium">{item.label}</span>
-            </Link>
-          ))}
-        </div>
+
+
 
 
         {/* Recommended */}
@@ -206,20 +182,8 @@ function Home() {
           ))}
         </div>
 
-        {/* Tip teaser */}
-        <div className="mt-8 rounded-4xl bg-accent/50 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground/70">
-            Neck care guide
-          </p>
-          <h3 className="mt-2 text-lg font-semibold text-accent-foreground">{tips[0].title}</h3>
-          <p className="mt-1 text-sm text-accent-foreground/80">{tips[0].excerpt}</p>
-          <Link
-            to="/tips"
-            className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent-foreground"
-          >
-            Read more <ArrowRight className="size-4" />
-          </Link>
-        </div>
+
+
 
         {!isPro && (
           <Link

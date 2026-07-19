@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth";
 import { LoginModal } from "@/components/LoginModal";
+import { LanguageProvider } from "@/lib/i18n";
 
 
 function NotFoundComponent() {
@@ -136,9 +137,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <LoginModal />
+        <LanguageProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <LoginModal />
+        </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

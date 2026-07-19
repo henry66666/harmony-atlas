@@ -346,3 +346,102 @@ async function suggestNameFromImage(
   const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
   return raw.replace(/^["'`]+|["'`.。!?]+$/g, "").slice(0, 60);
 }
+
+type TranslateBatchInput = {
+  targetLang: string;
+  targetLabel: string;
+  texts: string[];
+};
+
+export const translateBatch = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => {
+    const d = input as Partial<TranslateBatchInput>;
+    const texts = Array.isArray(d?.texts)
+      ? d!.texts!.map((s) => String(s ?? "")).filter((s) => s.length > 0).slice(0, 80)
+      : [];
+    return {
+      targetLang: String(d?.targetLang ?? "en").slice(0, 12),
+      targetLabel: String(d?.targetLabel ?? "English").slice(0, 40),
+      texts,
+    } satisfies TranslateBatchInput;
+  })
+  .handler(async ({ data }) => {
+    if (data.texts.length === 0) return { translations: [] as string[] };
+    if (data.targetLang === "en") return { translations: data.texts };
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const numbered = data.texts.map((t, i) => `${i + 1}. ${t.replace(/\n/g, " ")}`).join("\n");
+    const prompt = `You are a professional UI localizer. Translate the following short interface strings from English into ${data.targetLabel} (language code: ${data.targetLang}).
+
+Rules:
+- Return ONLY a JSON array of strings, in the exact same order as the input list.
+- Preserve product names ("QiWell", "Tui Na", "Gua Sha", "Baduanjin", "Yijinjing", "Qi") — do not translate proper nouns.
+- Keep translations concise and natural for a wellness mobile app.
+- Do not add quotes around the array items beyond the JSON format itself.
+- Do not add any commentary, prefix, or code fences.
+
+Input (${data.texts.length} items):
+${numbered}`;
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You translate UI strings. Always reply with a single JSON array of strings and nothing else.",
+          },
+          { role: "user", content: prompt },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      throw new Error(`Translate request failed [${res.status}]: ${errBody}`);
+    }
+
+    const json = (await res.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
+
+    // Model may return either a bare JSON array or an object wrapping it.
+    let arr: string[] = [];
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        arr = parsed.map((x) => String(x));
+      } else if (parsed && typeof parsed === "object") {
+        const obj = parsed as Record<string, unknown>;
+        const first = Object.values(obj).find((v) => Array.isArray(v));
+        if (Array.isArray(first)) arr = first.map((x) => String(x));
+      }
+    } catch {
+      // Try to extract a bracketed array from the raw string
+      const m = raw.match(/\[([\s\S]*)\]/);
+      if (m) {
+        try {
+          arr = (JSON.parse(`[${m[1]}]`) as unknown[]).map((x) => String(x));
+        } catch {
+          arr = [];
+        }
+      }
+    }
+
+    // Pad/truncate to match input length
+    while (arr.length < data.texts.length) arr.push(data.texts[arr.length]);
+    arr = arr.slice(0, data.texts.length);
+
+    return { translations: arr };
+  });
+
