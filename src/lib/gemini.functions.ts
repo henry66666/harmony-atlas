@@ -185,18 +185,26 @@ export const generateMoveMedia = createServerFn({ method: "POST" })
     } satisfies GenerateMoveMediaInput;
   })
   .handler(async ({ data }) => {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Try models in order; free-tier quota on the "preview-image" alias is often 0,
-    // so we fall back to alternative image-capable models on 429 / 404.
+    // Use Lovable AI Gateway image models instead of Google's direct v1beta
+    // preview IDs. The old direct models can return 404 even when Gemini image
+    // generation is available through the Gateway catalog.
     const envModel = process.env.GEMINI_IMAGE_MODEL;
     const modelCandidates = [
       envModel,
-      "gemini-2.5-flash-image",
-      "gemini-2.0-flash-preview-image-generation",
-      "gemini-2.0-flash-exp-image-generation",
-    ].filter((m): m is string => typeof m === "string" && m.length > 0);
+      "google/gemini-3.1-flash-image",
+      "google/gemini-3-pro-image",
+      "google/gemini-2.5-flash-image",
+      "openai/gpt-image-2",
+    ]
+      .filter((m): m is string => typeof m === "string" && m.length > 0)
+      .map((m) => {
+        if (m.startsWith("google/") || m.startsWith("openai/")) return m;
+        if (m.includes("gemini") && m.includes("image")) return `google/${m}`;
+        return m;
+      });
 
     const siblingLines = data.siblings.length
       ? data.siblings
@@ -228,35 +236,55 @@ VISUAL STYLE (must follow strictly)
 
 Return one image only.`;
 
+    const buildGatewayBody = (model: string) => {
+      if (model === "google/gemini-3.1-flash-lite-image") {
+        return {
+          model,
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+        };
+      }
+
+      if (model.startsWith("google/")) {
+        return {
+          model,
+          messages: [{ role: "user", content: prompt }],
+          modalities: ["image", "text"],
+        };
+      }
+
+      return {
+        model,
+        prompt,
+        quality: "low",
+        size: "1024x1024",
+        n: 1,
+      };
+    };
+
     let lastError = "";
     let lastStatus = 0;
-    for (const model of modelCandidates) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    for (const model of [...new Set(modelCandidates)]) {
       const res = await fetch(url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: { responseModalities: ["IMAGE"] },
-        }),
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(buildGatewayBody(model)),
       });
 
       if (res.ok) {
         const json = (await res.json()) as {
-          candidates?: {
-            content?: {
-              parts?: { inlineData?: { mimeType?: string; data?: string } }[];
-            };
-          }[];
+          data?: { b64_json?: string }[];
         };
-        const part = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
-        const inline = part?.inlineData;
-        if (!inline?.data) {
-          lastError = "Gemini returned no image data";
+        const b64 = json.data?.find((item) => item.b64_json)?.b64_json;
+        if (!b64) {
+          lastError = "Image model returned no image data";
           continue;
         }
-        const mimeType = inline.mimeType || "image/png";
-        return { dataUrl: `data:${mimeType};base64,${inline.data}`, mimeType, model };
+        const mimeType = "image/png";
+        return { dataUrl: `data:${mimeType};base64,${b64}`, mimeType, model };
       }
 
       lastStatus = res.status;
@@ -267,7 +295,7 @@ Return one image only.`;
 
     if (lastStatus === 429) {
       throw new Error(
-        "Image generation quota exhausted on the free tier for all available image models. Enable billing on your Google AI project, or set GEMINI_IMAGE_MODEL to a model your key has quota for.",
+        "Image generation quota was exhausted. Please retry later, add credits, or set GEMINI_IMAGE_MODEL to another supported Gateway image model.",
       );
     }
     throw new Error(`Gemini image request failed [${lastStatus}]: ${lastError}`);
