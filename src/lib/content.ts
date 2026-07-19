@@ -4,6 +4,11 @@ import shopOil from "@/assets/shop-oil.jpg";
 import shopGuasha from "@/assets/shop-guasha.jpg";
 import shopBianstone from "@/assets/shop-bianstone.jpg";
 import yintangPress from "@/assets/yintang-press.gif.asset.json";
+import oilApplyGif from "@/assets/oil-apply.gif.asset.json";
+import yintangGif from "@/assets/yintang.gif.asset.json";
+import kaitianmenGif from "@/assets/kaitianmen.gif.asset.json";
+import yangbaiGif from "@/assets/yangbai.gif.asset.json";
+void yintangPress;
 
 export const images = {
   heroQigong,
