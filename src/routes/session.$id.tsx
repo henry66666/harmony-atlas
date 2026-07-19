@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse, getProduct, images } from "@/lib/content";
