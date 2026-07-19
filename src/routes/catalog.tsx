@@ -145,11 +145,11 @@ function Catalog() {
                   </div>
                 </Link>
 
-                {c.custom && (
+                {"custom" in c && c.custom && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setDeleting(c as CustomRoutine);
+                      setDeleting(c);
                     }}
                     aria-label="Delete routine"
                     className="absolute bottom-3 right-3 flex size-8 items-center justify-center rounded-full bg-destructive/10 text-destructive transition-colors active:scale-95 hover:bg-destructive/20"
@@ -157,6 +157,7 @@ function Catalog() {
                     <Trash2 className="size-4" />
                   </button>
                 )}
+
               </div>
             ))}
           </div>
