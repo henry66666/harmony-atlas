@@ -107,15 +107,17 @@ function Home() {
           </Link>
         )}
 
-        {/* Hero illustration */}
-        <div className="relative mt-5 overflow-hidden rounded-4xl bg-secondary/50">
-          <img
-            src={images.heroQigong}
-            alt="A person gently practicing Baduanjin qigong"
-            width={1024}
-            height={1024}
-            className="aspect-square w-full object-cover"
-          />
+        {/* Hero illustrations */}
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          {[heroA, heroB].map((src, i) => (
+            <div key={i} className="relative overflow-hidden rounded-3xl bg-secondary/50">
+              <img
+                src={src}
+                alt="Gentle qigong practice illustration"
+                className="aspect-square w-full object-cover"
+              />
+            </div>
+          ))}
         </div>
 
         {/* Today's practice card */}
