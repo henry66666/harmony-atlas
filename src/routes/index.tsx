@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo } from "react";
 import {
   Bell,
   Gem,
@@ -13,6 +14,20 @@ import {
 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { CategoryIcon } from "@/components/CategoryIcon";
+import hero1 from "@/assets/hero-16489442.png.asset.json";
+import hero2 from "@/assets/hero-4343c4ff.png.asset.json";
+import hero3 from "@/assets/hero-636ef02b.png.asset.json";
+import hero4 from "@/assets/hero-a3ce83a1.png.asset.json";
+import hero5 from "@/assets/hero-af7dd0a3.png.asset.json";
+
+const heroImages = [hero1.url, hero2.url, hero3.url, hero4.url, hero5.url];
+
+function pickTwoRandom<T>(arr: T[]): [T, T] {
+  const i = Math.floor(Math.random() * arr.length);
+  let j = Math.floor(Math.random() * (arr.length - 1));
+  if (j >= i) j++;
+  return [arr[i], arr[j]];
+}
 import { useAuth } from "@/lib/auth";
 import { courses, images, tips } from "@/lib/content";
 
