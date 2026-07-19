@@ -175,7 +175,10 @@ function Home() {
               />
 
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{c.title}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate font-semibold">{c.title}</p>
+                  {c.hot && <Flame className="size-4 shrink-0 text-gold" />}
+                </div>
                 <p className="truncate text-sm text-muted-foreground">{c.subtitle}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {c.level} · {c.minutes} min
