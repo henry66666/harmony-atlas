@@ -35,6 +35,7 @@ export type Step = {
   seconds: number;
   cue: string;
   image?: string;
+  video?: string;
 };
 
 export type Course = {

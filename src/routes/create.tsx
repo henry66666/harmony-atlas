@@ -92,6 +92,7 @@ function CreateRoutine() {
           seconds: m.mode === "seconds" ? m.seconds : Math.max(10, m.reps * 3),
           cue: "Move gently and stay with the breath.",
           image: m.mediaKind === "image" ? m.mediaUrl : undefined,
+          video: m.mediaKind === "video" ? m.mediaUrl : undefined,
         })),
     });
     setSaved(true);
