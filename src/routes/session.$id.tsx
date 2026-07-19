@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag, Sparkles, BookOpen } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse, getProduct, images } from "@/lib/content";
-import { getCustomRoutine } from "@/lib/routines";
+import { useCustomRoutine } from "@/lib/routines";
 
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
