@@ -264,6 +264,7 @@ Return one image only.`;
 
     let lastError = "";
     let lastStatus = 0;
+    const url = "https://ai.gateway.lovable.dev/v1/images/generations";
     for (const model of [...new Set(modelCandidates)]) {
       const res = await fetch(url, {
         method: "POST",
