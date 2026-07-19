@@ -328,19 +328,40 @@ function CreateRoutine() {
                       </div>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputs.current[m.id]?.click()}
-                      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-secondary/40 py-4 text-sm font-medium text-muted-foreground"
-                    >
-                      <Upload className="size-4" />
-                      Upload video or image
-                    </button>
+                    <div className="flex items-stretch gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputs.current[m.id]?.click()}
+                        disabled={generatingId === m.id}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-secondary/40 py-4 text-sm font-medium text-muted-foreground disabled:opacity-50"
+                      >
+                        <Upload className="size-4" />
+                        Upload video or image
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => generateWithGemini(m.id)}
+                        disabled={generatingId !== null}
+                        aria-label="Generate with Gemini"
+                        title="Generate illustration with Gemini"
+                        className="flex w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/40 bg-gradient-to-br from-accent/60 to-primary/20 text-primary disabled:opacity-50"
+                      >
+                        {generatingId === m.id ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="size-4" />
+                        )}
+                      </button>
+                    </div>
                   )}
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    Accepted: MP4, MOV, JPG, JPEG, PNG
+                    Accepted: MP4, MOV, JPG, JPEG, PNG · or tap ✨ to generate with AI
                   </p>
+                  {genError && generatingId === null && (
+                    <p className="mt-1 text-[11px] text-destructive">{genError}</p>
+                  )}
                 </div>
+
 
                 {/* Duration or reps */}
                 <div className="mt-3 flex items-center gap-2">
