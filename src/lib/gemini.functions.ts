@@ -1,11 +1,57 @@
 import { createServerFn } from "@tanstack/react-start";
 
+export const GEMINI_MODELS = [
+  { id: "gemini-flash-latest", label: "Gemini Flash (latest)" },
+  { id: "gemini-flash-lite-latest", label: "Gemini Flash Lite" },
+  { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+  { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite" },
+  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+  { id: "gemini-2.0-flash-lite", label: "Gemini 2.0 Flash Lite" },
+] as const;
+
+export const REASONING_LEVELS = [
+  { id: "none", label: "Off", budget: 0 },
+  { id: "low", label: "Low", budget: 1024 },
+  { id: "medium", label: "Medium", budget: 8192 },
+  { id: "high", label: "High", budget: 16384 },
+  { id: "max", label: "Max", budget: 24576 },
+] as const;
+
+// Top 20 countries by population (2024) → primary language
+export const TRANSLATION_LANGUAGES = [
+  { id: "en", label: "English", country: "Default" },
+  { id: "zh", label: "中文 (简体)", country: "China" },
+  { id: "hi", label: "हिन्दी", country: "India" },
+  { id: "en-US", label: "English (US)", country: "United States" },
+  { id: "id", label: "Bahasa Indonesia", country: "Indonesia" },
+  { id: "ur", label: "اردو", country: "Pakistan" },
+  { id: "pt-BR", label: "Português (BR)", country: "Brazil" },
+  { id: "en-NG", label: "English (Nigeria)", country: "Nigeria" },
+  { id: "bn", label: "বাংলা", country: "Bangladesh" },
+  { id: "ru", label: "Русский", country: "Russia" },
+  { id: "es-MX", label: "Español (MX)", country: "Mexico" },
+  { id: "ja", label: "日本語", country: "Japan" },
+  { id: "am", label: "አማርኛ", country: "Ethiopia" },
+  { id: "fil", label: "Filipino", country: "Philippines" },
+  { id: "ar-EG", label: "العربية (مصر)", country: "Egypt" },
+  { id: "vi", label: "Tiếng Việt", country: "Vietnam" },
+  { id: "cd-fr", label: "Français (RDC)", country: "DR Congo" },
+  { id: "tr", label: "Türkçe", country: "Turkey" },
+  { id: "fa", label: "فارسی", country: "Iran" },
+  { id: "de", label: "Deutsch", country: "Germany" },
+  { id: "th", label: "ไทย", country: "Thailand" },
+] as const;
+
 type GeminiInput = {
   title: string;
   subtitle: string;
   moveName: string;
   moveDetail: string;
   goal: string;
+  model?: string;
+  reasoning?: string;
+  language?: string;
 };
 
 export const fetchWellnessKnowledge = createServerFn({ method: "POST" })
@@ -20,13 +66,32 @@ export const fetchWellnessKnowledge = createServerFn({ method: "POST" })
       moveName: String(d.moveName ?? ""),
       moveDetail: String(d.moveDetail ?? ""),
       goal: String(d.goal ?? ""),
+      model: typeof d.model === "string" ? d.model : undefined,
+      reasoning: typeof d.reasoning === "string" ? d.reasoning : undefined,
+      language: typeof d.language === "string" ? d.language : undefined,
     } satisfies GeminiInput;
   })
   .handler(async ({ data }) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
-    const prompt = `You are a knowledgeable Traditional Chinese Medicine (TCM) wellness educator writing for an international audience. Produce a clear, well-structured educational article in English about the following practice movement.
+    const model =
+      GEMINI_MODELS.find((m) => m.id === data.model)?.id ??
+      process.env.GEMINI_MODEL ??
+      "gemini-flash-latest";
+
+    const reasoning =
+      REASONING_LEVELS.find((r) => r.id === data.reasoning) ?? REASONING_LEVELS[0];
+
+    const language =
+      TRANSLATION_LANGUAGES.find((l) => l.id === data.language) ?? TRANSLATION_LANGUAGES[0];
+
+    const languageInstruction =
+      language.id === "en"
+        ? "Write the article in clear, natural English."
+        : `Write the entire article — including all H2 headings and body text — in ${language.label} (${language.country}). Do not include the English version.`;
+
+    const prompt = `You are a knowledgeable Traditional Chinese Medicine (TCM) wellness educator writing for an international audience. Produce a clear, well-structured educational article about the following practice movement.
 
 CONTEXT
 - Practice: ${data.title}
@@ -35,14 +100,17 @@ CONTEXT
 - Current Movement: ${data.moveName}
 - Movement Detail: ${data.moveDetail}
 
+LANGUAGE
+${languageInstruction}
+
 REQUIREMENTS
-Return a well-formatted Markdown document with the following sections (use H2 headings):
-1. ## Overview — 2-3 sentences introducing this movement and its TCM origin.
-2. ## How It Works — the meridians, acupoints, or body systems involved, explained in accessible language.
-3. ## Wellness Benefits — a bulleted list of 4-6 concrete benefits for body and mind.
-4. ## How to Practice Well — 3-5 short practical tips (posture, breathing, frequency).
-5. ## Who Should Be Careful — brief safety notes and contraindications.
-6. ## A Gentle Note — 1-2 warm closing sentences.
+Return a well-formatted Markdown document with the following sections (use H2 headings, translated to the target language):
+1. Overview — 2-3 sentences introducing this movement and its TCM origin.
+2. How It Works — the meridians, acupoints, or body systems involved, in accessible language.
+3. Wellness Benefits — a bulleted list of 4-6 concrete benefits for body and mind.
+4. How to Practice Well — 3-5 short practical tips (posture, breathing, frequency).
+5. Who Should Be Careful — brief safety notes and contraindications.
+6. A Gentle Note — 1-2 warm closing sentences.
 
 STYLE
 - Warm, calm, professional tone. No hype, no emojis in body text.
@@ -50,20 +118,26 @@ STYLE
 - Do not invent medical claims. Frame benefits as traditional wellness support, not medical treatment.
 - Output pure Markdown only. No preamble, no closing remarks outside the sections above.`;
 
-    const model = process.env.GEMINI_MODEL ?? "gemini-flash-latest";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+    const body: Record<string, unknown> = {
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    };
+
+    // Gemini 2.5+ supports thinkingConfig; older models ignore unknown fields.
+    body.generationConfig = {
+      thinkingConfig: { thinkingBudget: reasoning.budget },
+    };
 
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Gemini request failed [${res.status}]: ${body}`);
+      const errBody = await res.text();
+      throw new Error(`Gemini request failed [${res.status}]: ${errBody}`);
     }
 
     const json = (await res.json()) as {
@@ -77,5 +151,5 @@ STYLE
 
     if (!text) throw new Error("Gemini returned an empty response");
 
-    return { markdown: text };
+    return { markdown: text, model, reasoning: reasoning.id, language: language.id };
   });
