@@ -27,13 +27,13 @@ type Move = {
   mediaName?: string;
 };
 
-const ACCEPT = "video/mp4,video/quicktime,image/jpeg,image/jpg,image/png";
+const ACCEPT = "video/mp4,video/quicktime,image/jpeg,image/jpg,image/png,image/gif";
 
 function detectKind(file: File): MediaKind | null {
   const t = file.type.toLowerCase();
   const n = file.name.toLowerCase();
   if (t.startsWith("video/") || n.endsWith(".mp4") || n.endsWith(".mov")) return "video";
-  if (t.startsWith("image/") || /\.(jpe?g|png)$/.test(n)) return "image";
+  if (t.startsWith("image/") || /\.(jpe?g|png|gif)$/.test(n)) return "image";
   return null;
 }
 
@@ -362,7 +362,7 @@ function CreateRoutine() {
                     </div>
                   )}
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    Accepted: MP4, MOV, JPG, JPEG, PNG · or tap ✨ to generate with AI
+                    Accepted: MP4, MOV, JPG, JPEG, PNG, GIF · or tap ✨ to generate with AI
                   </p>
                   {genError && generatingId === null && (
                     <p className="mt-1 text-[11px] text-destructive">{genError}</p>

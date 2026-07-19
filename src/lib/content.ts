@@ -229,6 +229,17 @@ export const badges: Badge[] = [
   { id: "streak-21", name: "New Habit", hint: "21 days of practice", emoji: "🏵️", unlockedAtStreak: 21 },
   { id: "explorer", name: "Explorer", hint: "Try all four practices", emoji: "🧭", unlockedAtStreak: 10 },
   { id: "streak-100", name: "Centenary", hint: "100 days of devotion", emoji: "🏆", unlockedAtStreak: 100 },
+  { id: "tuina-master", name: "Tui Na Touch", hint: "Complete a Tui Na session", emoji: "🖐️", unlockedAtStreak: 2 },
+  { id: "guasha-glow", name: "Gua Sha Glow", hint: "Try a Gua Sha routine", emoji: "🪨", unlockedAtStreak: 2 },
+  { id: "baduanjin", name: "Eight Brocades", hint: "Practice Ba Duan Jin", emoji: "🌸", unlockedAtStreak: 6 },
+  { id: "yijinjing", name: "Sinew Transformer", hint: "Practice Yi Jin Jing", emoji: "🪷", unlockedAtStreak: 8 },
+  { id: "meridian", name: "Meridian Flow", hint: "Complete 5 meridian sessions", emoji: "💫", unlockedAtStreak: 12 },
+  { id: "eye-care", name: "Bright Eyes", hint: "Finish 3 eye-care routines", emoji: "👁️", unlockedAtStreak: 3 },
+  { id: "sleep-well", name: "Deep Rest", hint: "7 evening wind-down sessions", emoji: "🌛", unlockedAtStreak: 7 },
+  { id: "posture", name: "Upright Spirit", hint: "10 posture practices", emoji: "🏯", unlockedAtStreak: 10 },
+  { id: "breath", name: "Breath Keeper", hint: "Complete 15 breathing sessions", emoji: "🍵", unlockedAtStreak: 15 },
+  { id: "streak-30", name: "Moon Cycle", hint: "30 days of gentle care", emoji: "🌕", unlockedAtStreak: 30 },
+  { id: "streak-60", name: "Season Shift", hint: "60 days of practice", emoji: "🍂", unlockedAtStreak: 60 },
 ];
 
 export type Tip = {
