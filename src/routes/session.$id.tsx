@@ -185,13 +185,25 @@ function Session() {
       <div className="flex flex-1 flex-col px-5 pb-8 pt-6">
         {/* Illustration / timer */}
         <div className="relative flex flex-col items-center justify-center rounded-4xl bg-card py-10 shadow-card">
-          <img
-            src={step.image ?? course.sessionImage ?? images.emptyMeditate}
-            alt=""
-            width={1024}
-            height={1024}
-            className="size-44 rounded-3xl object-cover"
-          />
+          {step.video ? (
+            <video
+              src={step.video}
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+              className="size-44 rounded-3xl bg-black object-cover"
+            />
+          ) : (
+            <img
+              src={step.image ?? course.sessionImage ?? images.emptyMeditate}
+              alt=""
+              width={1024}
+              height={1024}
+              className="size-44 rounded-3xl object-cover"
+            />
+          )}
           <span className="mt-5 rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-accent-foreground">
             {paused ? "Paused" : `${step.seconds}s · hold gently`}
           </span>
