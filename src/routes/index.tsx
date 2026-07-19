@@ -19,8 +19,17 @@ import hero2 from "@/assets/hero-4343c4ff.png.asset.json";
 import hero3 from "@/assets/hero-636ef02b.png.asset.json";
 import hero4 from "@/assets/hero-a3ce83a1.png.asset.json";
 import hero5 from "@/assets/hero-af7dd0a3.png.asset.json";
+import hero6 from "@/assets/hero-extra-2c362488.png.asset.json";
+import hero7 from "@/assets/hero-extra-3c36ad0b.png.asset.json";
+import hero8 from "@/assets/hero-extra-612c4dc2.png.asset.json";
+import hero9 from "@/assets/hero-extra-39eb340c.png.asset.json";
+import hero10 from "@/assets/hero-extra-6e7ce32a.png.asset.json";
+import hero11 from "@/assets/hero-extra-d125e67d.png.asset.json";
 
-const heroImages = [hero1.url, hero2.url, hero3.url, hero4.url, hero5.url];
+const heroImages = [
+  hero1.url, hero2.url, hero3.url, hero4.url, hero5.url,
+  hero6.url, hero7.url, hero8.url, hero9.url, hero10.url, hero11.url,
+];
 
 function pickTwoRandom<T>(arr: T[]): [T, T] {
   const i = Math.floor(Math.random() * arr.length);
