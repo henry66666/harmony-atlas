@@ -24,8 +24,9 @@ function Catalog() {
   const custom = useCustomRoutines();
 
 
-  const all = [...custom, ...courses];
+  const all: (CustomRoutine | Course)[] = [...custom, ...courses];
   const filtered = all.filter((c) => {
+
     const matchesCat = active === "all" || c.category === active;
     const matchesQuery = `${c.title} ${c.subtitle} ${c.goal}`
       .toLowerCase()
