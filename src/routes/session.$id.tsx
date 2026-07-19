@@ -24,7 +24,7 @@ export const Route = createFileRoute("/session/$id")({
 
 function Session() {
   const { id } = useParams({ from: "/session/$id" });
-  const course = getCourse(id) ?? getCustomRoutine(id);
+  const course = getCourse(id) ?? useCustomRoutine(id);
   const navigate = useNavigate();
   const { recordSession } = useAuth();
 

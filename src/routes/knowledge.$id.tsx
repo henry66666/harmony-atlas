@@ -5,7 +5,7 @@ import { ChevronLeft, Sparkles, Loader2, RefreshCw, Cpu, Brain, Languages, Check
 import ReactMarkdown from "react-markdown";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse } from "@/lib/content";
-import { getCustomRoutine } from "@/lib/routines";
+import { useCustomRoutine } from "@/lib/routines";
 import {
   fetchWellnessKnowledge,
   GEMINI_MODELS,
