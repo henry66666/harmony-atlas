@@ -127,7 +127,7 @@ function CreateRoutine() {
         title="New routine"
         right={
           <button
-            onClick={() => canSave && setSaved(true)}
+            onClick={handleSave}
             disabled={!canSave}
             className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground disabled:opacity-40"
           >
@@ -137,13 +137,6 @@ function CreateRoutine() {
       />
 
       <div className="flex-1 space-y-6 px-5 pb-10 pt-4">
-        <button className="flex w-full items-center gap-3 rounded-3xl border border-dashed border-border bg-secondary/40 p-4 text-left text-muted-foreground">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-card">
-            <Camera className="size-5" />
-          </span>
-          <span className="text-sm">Add a cover image (optional)</span>
-        </button>
-
         <div>
           <label className="text-sm font-semibold">Routine name</label>
           <input
@@ -159,7 +152,7 @@ function CreateRoutine() {
         <div>
           <label className="text-sm font-semibold">Goal</label>
           <div className="mt-2 flex flex-wrap gap-2">
-            {goals.map((g) => (
+            {[...defaultGoals, ...customGoals].map((g) => (
               <button
                 key={g}
                 onClick={() => setGoal(g)}
@@ -173,6 +166,54 @@ function CreateRoutine() {
                 {g}
               </button>
             ))}
+            {addingGoal ? (
+              <div className="flex items-center gap-1 rounded-full border border-primary bg-card px-2 py-1">
+                <input
+                  autoFocus
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const v = newGoal.trim();
+                      if (v) {
+                        setCustomGoals((g) => [...g, v]);
+                        setGoal(v);
+                      }
+                      setNewGoal("");
+                      setAddingGoal(false);
+                    } else if (e.key === "Escape") {
+                      setNewGoal("");
+                      setAddingGoal(false);
+                    }
+                  }}
+                  placeholder="Custom goal"
+                  maxLength={16}
+                  className="w-28 bg-transparent px-2 text-sm outline-none"
+                />
+                <button
+                  onClick={() => {
+                    const v = newGoal.trim();
+                    if (v) {
+                      setCustomGoals((g) => [...g, v]);
+                      setGoal(v);
+                    }
+                    setNewGoal("");
+                    setAddingGoal(false);
+                  }}
+                  className="rounded-full bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground"
+                >
+                  Add
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAddingGoal(true)}
+                className="flex items-center gap-1 rounded-full border border-dashed border-primary/60 bg-accent/30 px-3 py-2 text-sm font-medium text-primary"
+              >
+                <Plus className="size-3.5" /> Custom
+              </button>
+            )}
+
           </div>
         </div>
 
