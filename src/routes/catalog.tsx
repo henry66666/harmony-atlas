@@ -147,7 +147,7 @@ function Catalog() {
                   </div>
                 </Link>
 
-                {c.custom && (
+                {"custom" in c && c.custom && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -159,6 +159,7 @@ function Catalog() {
                     <Trash2 className="size-4" />
                   </button>
                 )}
+
 
 
               </div>
