@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { X, Check, ChevronLeft, ChevronRight, Pause, Play, ArrowRight, ShoppingBag } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { getCourse, getProduct, images } from "@/lib/content";
+import { getCustomRoutine } from "@/lib/routines";
+
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/session/$id")({
 
 function Session() {
   const { id } = useParams({ from: "/session/$id" });
-  const course = getCourse(id);
+  const course = getCourse(id) ?? getCustomRoutine(id);
   const navigate = useNavigate();
   const { recordSession } = useAuth();
 
@@ -160,13 +162,14 @@ function Session() {
           <p className="text-xs text-muted-foreground">{course.subtitle}</p>
         </div>
         <div className="flex flex-col items-end">
-          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-primary">
+          <span className="rounded-2xl bg-primary/10 px-4 py-1.5 text-2xl font-bold tabular-nums leading-none text-primary">
             {String(Math.max(0, remaining)).padStart(2, "0")}s
           </span>
-          <span className="mt-0.5 text-xs font-medium text-muted-foreground">
+          <span className="mt-1 text-xs font-medium text-muted-foreground">
             {stepIndex + 1}/{total}
           </span>
         </div>
+
       </header>
 
       {/* Progress */}
