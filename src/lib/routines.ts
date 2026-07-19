@@ -32,6 +32,15 @@ export function getCustomRoutine(id: string): CustomRoutine | undefined {
   return read().find((r) => r.id === id);
 }
 
+export function deleteCustomRoutine(id: string): boolean {
+  const list = read();
+  const next = list.filter((r) => r.id !== id);
+  if (next.length === list.length) return false;
+  write(next);
+  return true;
+}
+
+
 export function saveCustomRoutine(routine: {
   name: string;
   goal: string | null;
