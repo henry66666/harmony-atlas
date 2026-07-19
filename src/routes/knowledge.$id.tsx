@@ -152,32 +152,35 @@ function KnowledgePage() {
         )}
       </main>
 
-      {/* Bottom control bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-card/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] backdrop-blur">
-        <div className="mx-auto flex max-w-md items-stretch gap-2 px-3 py-2.5">
-          <ToolbarButton
-            icon={<Cpu className="size-4" />}
-            label="Model"
-            value={currentModel.label.replace("Gemini ", "")}
-            active={openPanel === "model"}
-            onClick={() => setOpenPanel(openPanel === "model" ? null : "model")}
-          />
-          <ToolbarButton
-            icon={<Brain className="size-4" />}
-            label="Thinking"
-            value={currentReasoning.label}
-            active={openPanel === "reasoning"}
-            onClick={() => setOpenPanel(openPanel === "reasoning" ? null : "reasoning")}
-          />
-          <ToolbarButton
-            icon={<Languages className="size-4" />}
-            label="Language"
-            value={currentLanguage.label}
-            active={openPanel === "language"}
-            onClick={() => setOpenPanel(openPanel === "language" ? null : "language")}
-          />
+      {/* Bottom control bar — constrained to the mobile shell width */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
+        <div className="pointer-events-auto w-full max-w-md border-t border-border/60 bg-card/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] shadow-[0_-8px_24px_-16px_rgba(0,0,0,0.15)] backdrop-blur">
+          <div className="flex items-stretch gap-1.5 px-3 py-2">
+            <ToolbarButton
+              icon={<Cpu className="size-3.5" />}
+              label="Model"
+              value={currentModel.label.replace("Gemini ", "")}
+              active={openPanel === "model"}
+              onClick={() => setOpenPanel(openPanel === "model" ? null : "model")}
+            />
+            <ToolbarButton
+              icon={<Brain className="size-3.5" />}
+              label="Thinking"
+              value={currentReasoning.label}
+              active={openPanel === "reasoning"}
+              onClick={() => setOpenPanel(openPanel === "reasoning" ? null : "reasoning")}
+            />
+            <ToolbarButton
+              icon={<Languages className="size-3.5" />}
+              label="Language"
+              value={currentLanguage.label}
+              active={openPanel === "language"}
+              onClick={() => setOpenPanel(openPanel === "language" ? null : "language")}
+            />
+          </div>
         </div>
       </div>
+
 
       {openPanel && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -253,20 +256,25 @@ function ToolbarButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-1 flex-col items-start gap-0.5 rounded-2xl border px-3 py-2 text-left transition-colors",
+        "flex min-w-0 flex-1 items-center gap-2 rounded-2xl border px-2.5 py-2 text-left transition-colors",
         active
           ? "border-primary bg-accent text-accent-foreground"
           : "border-border bg-secondary/40",
       )}
     >
-      <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-card/70 text-foreground">
         {icon}
-        {label}
       </span>
-      <span className="w-full truncate text-xs font-semibold">{value}</span>
+      <span className="flex min-w-0 flex-1 flex-col leading-tight">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
+        <span className="truncate text-[11px] font-semibold">{value}</span>
+      </span>
     </button>
   );
 }
+
 
 function OptionList({
   title,
