@@ -107,6 +107,7 @@ function CreateRoutine() {
         mediaUrl: result.dataUrl,
         mediaKind: "image",
         mediaName: `AI illustration${result.mimeType.includes("png") ? ".png" : ".jpg"}`,
+        ...(result.suggestedName && !move.name.trim() ? { name: result.suggestedName } : {}),
       });
     } catch (e) {
       setGenError(e instanceof Error ? e.message : "Failed to generate image");
