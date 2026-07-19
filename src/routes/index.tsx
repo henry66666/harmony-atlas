@@ -45,7 +45,11 @@ function Home() {
   const { user, streak, openLogin, isPro } = useAuth();
   const navigate = useNavigate();
   const todays = courses[0];
-  const recommended = courses.slice(1, 4);
+  const facial = courses.find((c) => c.id === "guasha-face")!;
+  const recommended = [
+    facial,
+    ...courses.slice(1, 4).filter((c) => c.id !== "guasha-face"),
+  ];
   const [heroA, heroB] = useMemo(() => pickTwoRandom(heroImages), []);
 
   const startToday = () => {
@@ -171,7 +175,10 @@ function Home() {
               />
 
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{c.title}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate font-semibold">{c.title}</p>
+                  {c.hot && <Flame className="size-4 shrink-0 text-gold" />}
+                </div>
                 <p className="truncate text-sm text-muted-foreground">{c.subtitle}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {c.level} · {c.minutes} min

@@ -121,6 +121,7 @@ export const courses: Course[] = [
     minutes: 8,
     goal: "De-puff & lift",
     bestFor: "Morning freshness",
+    hot: true,
     accent: "sage",
     relatedProductId: "guasha-jade",
     steps: [
