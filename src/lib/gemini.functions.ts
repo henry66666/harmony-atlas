@@ -285,7 +285,11 @@ Return one image only.`;
           continue;
         }
         const mimeType = "image/png";
-        return { dataUrl: `data:${mimeType};base64,${b64}`, mimeType, model };
+        const dataUrl = `data:${mimeType};base64,${b64}`;
+        const suggestedName = await suggestNameFromImage(apiKey, dataUrl, data).catch(
+          () => "",
+        );
+        return { dataUrl, mimeType, model, suggestedName };
       }
 
       lastStatus = res.status;
