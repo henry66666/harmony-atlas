@@ -64,7 +64,7 @@ function Session() {
       next();
       return;
     }
-    const t = setTimeout(() => setRemaining((s) => s - 1), 1000);
+    const t = setTimeout(() => setRemaining((s: number) => s - 1), 1000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining, paused, finished, stepIndex]);
