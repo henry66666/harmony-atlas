@@ -227,11 +227,11 @@ function Session() {
                   AI · Gemini
                 </span>
               </div>
-              <p className="mt-1 text-sm font-semibold text-foreground">
-                Learn the TCM story behind "{step.name}"
+              <p className="mt-1 text-sm font-semibold text-foreground line-clamp-1">
+                Why "{step.name}" works
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Meridians, benefits & how to practice well.
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                {step.detail} · TCM meridians, benefits & tips for this move.
               </p>
             </div>
             <BookOpen className="mt-1 size-5 shrink-0 text-gold-foreground/70" />
