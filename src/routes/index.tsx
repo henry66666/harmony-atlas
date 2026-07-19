@@ -45,7 +45,11 @@ function Home() {
   const { user, streak, openLogin, isPro } = useAuth();
   const navigate = useNavigate();
   const todays = courses[0];
-  const recommended = courses.slice(1, 4);
+  const facial = courses.find((c) => c.id === "guasha-face")!;
+  const recommended = [
+    facial,
+    ...courses.slice(1, 4).filter((c) => c.id !== "guasha-face"),
+  ];
   const [heroA, heroB] = useMemo(() => pickTwoRandom(heroImages), []);
 
   const startToday = () => {
