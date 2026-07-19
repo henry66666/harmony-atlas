@@ -3,8 +3,9 @@ import { useState } from "react";
 import { Search, Plus, Clock, Flame, ChevronRight, Trash2, X } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { CategoryIcon } from "@/components/CategoryIcon";
-import { categories, courses, type Category } from "@/lib/content";
+import { categories, courses, type Category, type Course } from "@/lib/content";
 import { useCustomRoutines, deleteCustomRoutine, type CustomRoutine } from "@/lib/routines";
+
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
