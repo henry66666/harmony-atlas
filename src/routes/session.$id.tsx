@@ -207,7 +207,13 @@ function Session() {
         <div className="mt-auto pt-6">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
+              onClick={() => {
+                if (stepIndex > 0) {
+                  const p = stepIndex - 1;
+                  setStepIndex(p);
+                  setRemaining(course.steps[p].seconds);
+                }
+              }}
               disabled={stepIndex === 0}
               className="flex size-14 items-center justify-center rounded-2xl border border-border bg-card text-foreground disabled:opacity-40"
               aria-label="Previous move"
