@@ -123,7 +123,7 @@ function KnowledgePage() {
 
         {query.data && (
           <article className="rounded-4xl border border-border/60 bg-card p-6 shadow-card">
-            <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-h2:mt-6 prose-h2:text-base prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground">
+            <div className="space-y-3 text-sm leading-relaxed text-foreground/85 [&_h2]:mt-5 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:mt-4 [&_h3]:font-semibold [&_h3]:text-foreground [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:space-y-1.5 [&_ol]:pl-5 [&_strong]:font-semibold [&_strong]:text-foreground [&_p]:leading-relaxed">
               <ReactMarkdown>{query.data.markdown}</ReactMarkdown>
             </div>
           </article>
