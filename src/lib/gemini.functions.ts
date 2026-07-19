@@ -305,3 +305,44 @@ Return one image only.`;
     }
     throw new Error(`Gemini image request failed [${lastStatus}]: ${lastError}`);
   });
+
+async function suggestNameFromImage(
+  apiKey: string,
+  dataUrl: string,
+  ctx: { routineName: string; goal: string | null; moveDetail: string; durationLabel: string },
+): Promise<string> {
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You name wellness movements shown in illustrations. Reply with ONLY a short English name (2-5 words, Title Case), no quotes, no punctuation at the end, no explanation.",
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Routine: ${ctx.routineName}\nGoal: ${ctx.goal ?? "general wellbeing"}\nDuration: ${ctx.durationLabel}\nContext: ${ctx.moveDetail || "n/a"}\n\nBased on the illustration, give a concise movement name.`,
+            },
+            { type: "image_url", image_url: { url: dataUrl } },
+          ],
+        },
+      ],
+      max_tokens: 24,
+    }),
+  });
+  if (!res.ok) return "";
+  const json = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+  };
+  const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
+  return raw.replace(/^["'`]+|["'`.。!?]+$/g, "").slice(0, 60);
+}
