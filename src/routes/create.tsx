@@ -39,12 +39,16 @@ function detectKind(file: File): MediaKind | null {
 function CreateRoutine() {
   const [name, setName] = useState("");
   const [goal, setGoal] = useState<string | null>(null);
+  const [customGoals, setCustomGoals] = useState<string[]>([]);
+  const [addingGoal, setAddingGoal] = useState(false);
+  const [newGoal, setNewGoal] = useState("");
   const [moves, setMoves] = useState<Move[]>([
     { id: 1, name: "", seconds: 60, reps: 10, mode: "seconds" },
     { id: 2, name: "", seconds: 60, reps: 10, mode: "seconds" },
   ]);
   const [saved, setSaved] = useState(false);
   const fileInputs = useRef<Record<number, HTMLInputElement | null>>({});
+
 
   const addMove = () =>
     setMoves((m) => [...m, { id: Date.now(), name: "", seconds: 60, reps: 10, mode: "seconds" }]);
@@ -75,7 +79,26 @@ function CreateRoutine() {
 
   const canSave = name.trim() && moves.some((m) => m.name.trim() || m.mediaUrl);
 
+  const handleSave = () => {
+    if (!canSave) return;
+    saveCustomRoutine({
+      name: name.trim(),
+      goal,
+      steps: moves
+        .filter((m) => m.name.trim() || m.mediaUrl)
+        .map((m) => ({
+          name: m.name.trim() || "Movement",
+          detail: m.mode === "reps" ? `${m.reps} reps` : "",
+          seconds: m.mode === "seconds" ? m.seconds : Math.max(10, m.reps * 3),
+          cue: "Move gently and stay with the breath.",
+          image: m.mediaKind === "image" ? m.mediaUrl : undefined,
+        })),
+    });
+    setSaved(true);
+  };
+
   if (saved) {
+
     return (
       <MobileShell showNav={false}>
         <AppBar title="Routine saved" />
