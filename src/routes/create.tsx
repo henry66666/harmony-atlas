@@ -80,7 +80,43 @@ function CreateRoutine() {
     update(id, { mediaUrl: undefined, mediaKind: undefined, mediaName: undefined });
   };
 
+  const generateWithGemini = async (id: number) => {
+    const move = moves.find((x) => x.id === id);
+    if (!move) return;
+    setGenError(null);
+    setGeneratingId(id);
+    try {
+      const idx = moves.findIndex((x) => x.id === id);
+      const result = await generateMoveMedia({
+        data: {
+          routineName: name.trim() || "Untitled routine",
+          goal,
+          moveName: move.name.trim() || `Movement ${idx + 1}`,
+          moveDetail: "",
+          durationLabel: move.mode === "seconds" ? `${move.seconds}s` : `${move.reps} reps`,
+          index: idx,
+          total: moves.length,
+          siblings: moves.map((s, i) => ({
+            name: s.name.trim() || `Movement ${i + 1}`,
+            detail: s.mode === "seconds" ? `${s.seconds}s` : `${s.reps} reps`,
+          })),
+        },
+      });
+      if (move.mediaUrl?.startsWith("blob:")) URL.revokeObjectURL(move.mediaUrl);
+      update(id, {
+        mediaUrl: result.dataUrl,
+        mediaKind: "image",
+        mediaName: `AI illustration${result.mimeType.includes("png") ? ".png" : ".jpg"}`,
+      });
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : "Failed to generate image");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
   const canSave = name.trim() && moves.some((m) => m.name.trim() || m.mediaUrl);
+
 
   const handleSave = () => {
     if (!canSave) return;
