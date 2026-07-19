@@ -50,9 +50,22 @@ function Session() {
   };
 
   const next = () => {
-    if (stepIndex < total - 1) setStepIndex((i) => i + 1);
-    else complete();
+    if (stepIndex < total - 1) {
+      setStepIndex((i) => i + 1);
+      setRemaining(course.steps[stepIndex + 1]?.seconds ?? 0);
+    } else complete();
   };
+
+  useEffect(() => {
+    if (finished || paused) return;
+    if (remaining <= 0) {
+      next();
+      return;
+    }
+    const t = setTimeout(() => setRemaining((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remaining, paused, finished, stepIndex]);
 
   /* ---------- Completion screen ---------- */
   if (finished) {
