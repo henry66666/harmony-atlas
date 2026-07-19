@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Plus, Trash2, Check, GripVertical, Upload, X } from "lucide-react";
+import { Plus, Trash2, Check, GripVertical, Upload, X, Sparkles, Loader2 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { AppBar } from "@/components/AppBar";
 import { saveCustomRoutine } from "@/lib/routines";
+import { generateMoveMedia } from "@/lib/gemini.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/create")({
