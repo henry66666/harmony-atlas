@@ -5,12 +5,8 @@ import {
   Gem,
   Flame,
   ArrowRight,
-  
   Clock,
   ChevronRight,
-  Leaf,
-  Wind,
-  Award,
 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { CategoryIcon } from "@/components/CategoryIcon";
@@ -38,17 +34,11 @@ function pickTwoRandom<T>(arr: T[]): [T, T] {
   return [arr[i], arr[j]];
 }
 import { useAuth } from "@/lib/auth";
-import { courses, images, tips } from "@/lib/content";
+import { courses } from "@/lib/content";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
-
-const quickLinks = [
-  { to: "/tips" as const, label: "Health tips", icon: Leaf, dot: true },
-  { to: "/catalog" as const, label: "Join practice", icon: Wind },
-  { to: "/achievements" as const, label: "My badges", icon: Award },
-];
 
 
 function Home() {
