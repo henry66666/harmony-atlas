@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TipsIdRouteImport } from './routes/tips.$id'
 import { Route as ShopIdRouteImport } from './routes/shop.$id'
 import { Route as SessionIdRouteImport } from './routes/session.$id'
+import { Route as KnowledgeIdRouteImport } from './routes/knowledge.$id'
 
 const TipsRoute = TipsRouteImport.update({
   id: '/tips',
@@ -88,6 +89,11 @@ const SessionIdRoute = SessionIdRouteImport.update({
   path: '/session/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KnowledgeIdRoute = KnowledgeIdRouteImport.update({
+  id: '/knowledge/$id',
+  path: '/knowledge/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tips': typeof TipsRouteWithChildren
+  '/knowledge/$id': typeof KnowledgeIdRoute
   '/session/$id': typeof SessionIdRoute
   '/shop/$id': typeof ShopIdRoute
   '/tips/$id': typeof TipsIdRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tips': typeof TipsRouteWithChildren
+  '/knowledge/$id': typeof KnowledgeIdRoute
   '/session/$id': typeof SessionIdRoute
   '/shop/$id': typeof ShopIdRoute
   '/tips/$id': typeof TipsIdRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tips': typeof TipsRouteWithChildren
+  '/knowledge/$id': typeof KnowledgeIdRoute
   '/session/$id': typeof SessionIdRoute
   '/shop/$id': typeof ShopIdRoute
   '/tips/$id': typeof TipsIdRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/tips'
+    | '/knowledge/$id'
     | '/session/$id'
     | '/shop/$id'
     | '/tips/$id'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/tips'
+    | '/knowledge/$id'
     | '/session/$id'
     | '/shop/$id'
     | '/tips/$id'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/tips'
+    | '/knowledge/$id'
     | '/session/$id'
     | '/shop/$id'
     | '/tips/$id'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TipsRoute: typeof TipsRouteWithChildren
+  KnowledgeIdRoute: typeof KnowledgeIdRoute
   SessionIdRoute: typeof SessionIdRoute
 }
 
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/knowledge/$id': {
+      id: '/knowledge/$id'
+      path: '/knowledge/$id'
+      fullPath: '/knowledge/$id'
+      preLoaderRoute: typeof KnowledgeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TipsRoute: TipsRouteWithChildren,
+  KnowledgeIdRoute: KnowledgeIdRoute,
   SessionIdRoute: SessionIdRoute,
 }
 export const routeTree = rootRouteImport
