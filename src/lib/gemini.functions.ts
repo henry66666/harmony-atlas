@@ -153,3 +153,101 @@ STYLE
 
     return { markdown: text, model, reasoning: reasoning.id, language: language.id };
   });
+
+type GenerateMoveMediaInput = {
+  routineName: string;
+  goal: string | null;
+  moveName: string;
+  moveDetail: string;
+  durationLabel: string;
+  index: number;
+  total: number;
+  siblings: { name: string; detail: string }[];
+};
+
+export const generateMoveMedia = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => {
+    const d = input as Partial<GenerateMoveMediaInput>;
+    return {
+      routineName: String(d?.routineName ?? "").slice(0, 120),
+      goal: d?.goal ? String(d.goal).slice(0, 40) : null,
+      moveName: String(d?.moveName ?? "").slice(0, 120),
+      moveDetail: String(d?.moveDetail ?? "").slice(0, 200),
+      durationLabel: String(d?.durationLabel ?? "").slice(0, 40),
+      index: Number(d?.index ?? 0),
+      total: Number(d?.total ?? 1),
+      siblings: Array.isArray(d?.siblings)
+        ? d!.siblings!.slice(0, 8).map((s) => ({
+            name: String(s?.name ?? "").slice(0, 80),
+            detail: String(s?.detail ?? "").slice(0, 120),
+          }))
+        : [],
+    } satisfies GenerateMoveMediaInput;
+  })
+  .handler(async ({ data }) => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
+
+    const model = "gemini-2.5-flash-image";
+
+    const siblingLines = data.siblings.length
+      ? data.siblings
+          .map((s, i) => `  ${i + 1}. ${s.name}${s.detail ? ` — ${s.detail}` : ""}`)
+          .join("\n")
+      : "  (none)";
+
+    const prompt = `Create a single high-quality illustration for a Chinese wellness (TCM) mobile app.
+
+ROUTINE CONTEXT
+- Routine name: ${data.routineName || "(untitled routine)"}
+- Wellness goal: ${data.goal ?? "general wellbeing"}
+- Step ${data.index + 1} of ${data.total}
+- All steps in this routine:
+${siblingLines}
+
+CURRENT MOVEMENT TO DEPICT
+- Name: ${data.moveName || "Movement"}
+- Body area / detail: ${data.moveDetail || "unspecified"}
+- Duration: ${data.durationLabel}
+
+VISUAL STYLE (must follow strictly)
+- Minimalist textured flat-watercolor illustration with subtle paper grain and light noise.
+- Muted Morandi palette: warm off-white background (#FDFBF7), sage green, muted mustard, soft clay, dusty rose. Low saturation, warm tones, no gradients, no strong contrast.
+- Human figure (if shown): extremely simple vector cartoon, minimal facial features, clean line body, calm posture that clearly demonstrates the movement on the correct body area.
+- Composition: single centered subject, generous whitespace, gentle and healing feeling, matte paper texture.
+- Absolutely no text, no letters, no numbers, no watermark, no UI, no logos in the image.
+- Square 1:1 framing suitable for a mobile card.
+
+Return one image only.`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { responseModalities: ["IMAGE"] },
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      throw new Error(`Gemini image request failed [${res.status}]: ${errBody}`);
+    }
+
+    const json = (await res.json()) as {
+      candidates?: {
+        content?: {
+          parts?: { inlineData?: { mimeType?: string; data?: string } }[];
+        };
+      }[];
+    };
+
+    const part = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
+    const inline = part?.inlineData;
+    if (!inline?.data) throw new Error("Gemini returned no image data");
+
+    const mimeType = inline.mimeType || "image/png";
+    return { dataUrl: `data:${mimeType};base64,${inline.data}`, mimeType };
+  });
